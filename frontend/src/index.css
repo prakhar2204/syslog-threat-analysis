@@ -1,0 +1,39 @@
+@import "tailwindcss";
+
+@theme {
+  --color-severity-critical: #dc3545;
+  --color-severity-high: #e67700;
+  --color-severity-medium: #ffc107;
+  --color-severity-low: #0d6efd;
+  --color-severity-info: #198754;
+  --color-primary: #1a73e8;
+  --color-bg-main: #f1f3f5;
+  --color-bg-card: #ffffff;
+  --color-border: #dee2e6;
+  --color-text-primary: #202124;
+  --color-text-secondary: #5f6368;
+  --color-sidebar-bg: #1e293b;
+  --color-sidebar-text: #cbd5e1;
+  --color-sidebar-hover: #334155;
+  --color-sidebar-active: #1a73e8;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background-color: var(--color-bg-main);
+  color: var(--color-text-primary);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Scrollbar styling for log streams */
+.log-stream::-webkit-scrollbar { width: 6px; }
+.log-stream::-webkit-scrollbar-track { background: transparent; }
+.log-stream::-webkit-scrollbar-thumb { background: #adb5bd; border-radius: 3px; }
+
+/* Severity row borders */
+.severity-row-CRITICAL { border-left: 3px solid var(--color-severity-critical); }
+.severity-row-HIGH { border-left: 3px solid var(--color-severity-high); }
+.severity-row-MEDIUM { border-left: 3px solid var(--color-severity-medium); }
+.severity-row-LOW { border-left: 3px solid var(--color-severity-low); }
+.severity-row-INFO { border-left: 3px solid var(--color-severity-info); }

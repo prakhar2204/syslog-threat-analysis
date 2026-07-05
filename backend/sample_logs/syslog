@@ -1,0 +1,502 @@
+Jul 05 14:14:05 prod-db-01 kernel: [9632.374605] EXT4-fs (sda1): mounted filesystem with ordered data mode
+Jul 05 14:14:10 prod-app-01 anacron[58085]: Session terminated.
+Jul 05 14:14:20 prod-db-01 kernel: [7316.667264] TCP: request_sock_TCP: Possible SYN flooding
+Jul 05 14:14:22 prod-db-01 NetworkManager[63488]: <info>  [wlan0]: link up
+Jul 05 14:14:33 gateway-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=103.214.56.78 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=47281 DPT=80
+Jul 05 14:14:44 prod-db-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=45.33.32.156 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=44784 DPT=80
+Jul 05 14:14:58 prod-app-01 CRON[24009]: (root) CMD (/usr/bin/certbot renew)
+Jul 05 14:14:59 prod-db-01 anacron[24764]: Session terminated.
+Jul 05 14:15:13 prod-db-01 NetworkManager[60113]: <info>  [ens3]: link up
+Jul 05 14:15:32 prod-db-01 systemd[9937]: Listening on socket.
+Jul 05 14:15:36 prod-db-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=78.46.89.12 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=63298 DPT=8080
+Jul 05 14:15:46 gateway-01 CRON[50972]: (www-data) CMD (/usr/local/bin/backup.sh)
+Jul 05 14:15:55 gateway-01 systemd-logind[3665]: Service watchdog timeout.
+Jul 05 14:16:05 prod-db-01 systemd[1]: Stopped postgresql.service.
+Jul 05 14:16:09 prod-db-01 CRON[38779]: (root) CMD (/usr/bin/certbot renew)
+Jul 05 14:16:28 prod-web-01 systemd[1]: Reloading nginx.service.
+Jul 05 14:16:35 prod-app-01 systemd[27673]: New session created.
+Jul 05 14:16:47 prod-app-01 CRON[33064]: (www-data) CMD (/usr/bin/logrotate /etc/logrotate.conf)
+Jul 05 14:17:06 prod-web-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=198.51.100.23 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=53858 DPT=445
+Jul 05 14:17:22 prod-web-01 systemd[36360]: Listening on socket.
+Jul 05 14:17:40 gateway-01 systemd[1]: Restarted cron.service.
+Jul 05 14:17:48 prod-app-01 kernel: [7313.471604] usb 1-1: new high-speed USB device
+Jul 05 14:18:01 prod-app-01 systemd[1]: Restarted nginx.service.
+Jul 05 14:18:13 prod-db-01 systemd[1]: Stopped cron.service.
+Jul 05 14:18:33 prod-web-01 systemd[1]: disk usage warning: /var/log is 92% full
+Jul 05 14:18:45 gateway-01 systemd[25397]: Session terminated.
+Jul 05 14:18:51 gateway-01 CRON[42054]: (www-data) CMD (/usr/bin/logrotate /etc/logrotate.conf)
+Jul 05 14:19:03 prod-db-01 NetworkManager[1172]: <info>  [ens3]: link down
+Jul 05 14:19:16 prod-db-01 NetworkManager[22308]: <info>  [eth0]: link down
+Jul 05 14:19:34 prod-app-01 dhclient[54422]: New session created.
+Jul 05 14:19:49 prod-db-01 systemd-logind[33970]: New session created.
+Jul 05 14:20:02 prod-db-01 systemd[1]: Restarted redis-server.service.
+Jul 05 14:20:14 gateway-01 NetworkManager[42654]: <info>  [eth0]: link up
+Jul 05 14:20:23 prod-web-01 systemd[1]: Reloading docker.service.
+Jul 05 14:20:29 prod-app-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=78.46.89.12 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=63906 DPT=22
+Jul 05 14:20:31 prod-db-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=91.240.118.172 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=55220 DPT=443
+Jul 05 14:20:41 gateway-01 dbus-daemon[22221]: Configuration reloaded.
+Jul 05 14:20:50 prod-db-01 systemd[1]: Reloading docker.service.
+Jul 05 14:20:52 gateway-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=78.46.89.12 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=44471 DPT=23
+Jul 05 14:21:05 prod-db-01 kernel: [2661.605190] audit: type=1400 avc:  denied  { read }
+Jul 05 14:21:07 gateway-01 kernel: [2705.788043] EXT4-fs (sda1): mounted filesystem with ordered data mode
+Jul 05 14:21:10 prod-web-01 kernel: [3591.086391] TCP: request_sock_TCP: Possible SYN flooding
+Jul 05 14:21:29 prod-web-01 systemd[1]: Started redis-server.service.
+Jul 05 14:21:31 gateway-01 systemd[63994]: Service watchdog timeout.
+Jul 05 14:21:45 prod-db-01 systemd[1]: Started postgresql.service.
+Jul 05 14:21:51 prod-app-01 CRON[25146]: (www-data) CMD (/usr/bin/certbot renew)
+Jul 05 14:22:03 gateway-01 NetworkManager[52490]: <info>  [ens3]: carrier acquired
+Jul 05 14:22:22 prod-app-01 systemd[1]: Started cron.service.
+Jul 05 14:22:25 prod-app-01 CRON[15702]: (www-data) CMD (/usr/bin/certbot renew)
+Jul 05 14:22:32 prod-app-01 CRON[7669]: (root) CMD (/usr/bin/certbot renew)
+Jul 05 14:22:44 prod-db-01 systemd[1]: disk usage warning: /var/log is 92% full
+Jul 05 14:22:56 prod-app-01 CRON[16486]: (www-data) CMD (/usr/bin/logrotate /etc/logrotate.conf)
+Jul 05 14:23:00 prod-app-01 NetworkManager[2696]: New session created.
+Jul 05 14:23:04 prod-db-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=91.240.118.172 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=44046 DPT=3306
+Jul 05 14:23:23 prod-web-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=185.220.101.34 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=54009 DPT=443
+Jul 05 14:23:25 prod-db-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=45.33.32.156 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=42428 DPT=8080
+Jul 05 14:23:41 gateway-01 systemd[1]: disk usage warning: /var/log is 92% full
+Jul 05 14:23:55 gateway-01 systemd[1]: disk usage warning: /var/log is 92% full
+Jul 05 14:23:57 prod-db-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=198.51.100.23 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=47857 DPT=23
+Jul 05 14:24:17 gateway-01 systemd-logind[51672]: Configuration reloaded.
+Jul 05 14:24:36 gateway-01 systemd-logind[17932]: Session terminated.
+Jul 05 14:24:40 gateway-01 systemd[1]: Reloading docker.service.
+Jul 05 14:24:57 prod-app-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=78.46.89.12 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=40115 DPT=22
+Jul 05 14:25:01 prod-app-01 dhclient[40301]: Configuration reloaded.
+Jul 05 14:25:08 prod-web-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=103.214.56.78 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=42451 DPT=445
+Jul 05 14:25:18 prod-app-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=203.0.113.45 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=55244 DPT=23
+Jul 05 14:25:32 prod-app-01 systemd[1]: Reloading docker.service.
+Jul 05 14:25:52 prod-app-01 NetworkManager[61743]: <info>  [eth0]: DHCP lease renewed
+Jul 05 14:26:01 gateway-01 systemd[1]: disk usage warning: /var/log is 92% full
+Jul 05 14:26:02 prod-app-01 kernel: [1345.307956] Out of memory: Kill process
+Jul 05 14:26:19 prod-db-01 CRON[62056]: (root) CMD (/usr/local/bin/backup.sh)
+Jul 05 14:26:32 gateway-01 systemd[1]: Reloading docker.service.
+Jul 05 14:26:44 prod-web-01 systemd[1]: Started postgresql.service.
+Jul 05 14:26:48 prod-app-01 systemd[18245]: Listening on socket.
+Jul 05 14:27:04 prod-app-01 CRON[5383]: (www-data) CMD (/usr/bin/certbot renew)
+Jul 05 14:27:06 gateway-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=78.46.89.12 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=45443 DPT=3306
+Jul 05 14:27:17 prod-web-01 systemd[1]: Reloading postgresql.service.
+Jul 05 14:27:25 prod-app-01 CRON[3568]: (root) CMD (/usr/bin/logrotate /etc/logrotate.conf)
+Jul 05 14:27:45 gateway-01 CRON[40491]: (root) CMD (/usr/bin/certbot renew)
+Jul 05 14:27:59 prod-db-01 systemd[13770]: Configuration reloaded.
+Jul 05 14:28:08 prod-web-01 systemd[1]: Stopped docker.service.
+Jul 05 14:28:18 prod-web-01 systemd[1]: Restarted postgresql.service.
+Jul 05 14:28:32 prod-web-01 anacron[49995]: Session terminated.
+Jul 05 14:28:34 prod-app-01 systemd[1]: Stopped redis-server.service.
+Jul 05 14:28:35 prod-web-01 systemd[1]: Stopped redis-server.service.
+Jul 05 14:28:43 prod-web-01 systemd[1]: Stopped nginx.service.
+Jul 05 14:28:53 prod-db-01 kernel: [1899.459041] EXT4-fs (sda1): mounted filesystem with ordered data mode
+Jul 05 14:29:03 prod-app-01 NetworkManager[42937]: Service watchdog timeout.
+Jul 05 14:29:19 prod-web-01 CRON[53137]: (www-data) CMD (/usr/local/bin/backup.sh)
+Jul 05 14:29:37 prod-app-01 NetworkManager[39087]: <info>  [ens3]: carrier acquired
+Jul 05 14:29:39 prod-db-01 CRON[27738]: (www-data) CMD (/usr/bin/certbot renew)
+Jul 05 14:29:40 gateway-01 systemd[1]: Stopped nginx.service.
+Jul 05 14:29:47 prod-app-01 NetworkManager[21228]: <info>  [ens3]: carrier acquired
+Jul 05 14:30:04 prod-app-01 systemd[1]: Reloading docker.service.
+Jul 05 14:30:12 prod-web-01 CRON[17838]: (root) CMD (/usr/local/bin/backup.sh)
+Jul 05 14:30:18 prod-db-01 systemd[1]: Stopped docker.service.
+Jul 05 14:30:37 prod-web-01 CRON[57990]: (www-data) CMD (/usr/bin/logrotate /etc/logrotate.conf)
+Jul 05 14:30:44 prod-db-01 cron[39476]: Configuration reloaded.
+Jul 05 14:30:52 prod-web-01 systemd[7610]: New session created.
+Jul 05 14:31:04 gateway-01 CRON[38410]: (root) CMD (/usr/bin/certbot renew)
+Jul 05 14:31:15 gateway-01 cron[37740]: Listening on socket.
+Jul 05 14:31:25 prod-app-01 anacron[32906]: Listening on socket.
+Jul 05 14:31:43 prod-app-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=91.240.118.172 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=43634 DPT=8080
+Jul 05 14:31:52 prod-web-01 systemd[1]: disk usage warning: /var/log is 92% full
+Jul 05 14:31:56 gateway-01 systemd[49688]: Session terminated.
+Jul 05 14:32:01 prod-app-01 CRON[10288]: (www-data) CMD (/usr/bin/certbot renew)
+Jul 05 14:32:13 prod-app-01 systemd[1]: Stopped postgresql.service.
+Jul 05 14:32:26 prod-web-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=78.46.89.12 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=55412 DPT=23
+Jul 05 14:32:38 gateway-01 systemd[1]: Started redis-server.service.
+Jul 05 14:32:55 prod-db-01 CRON[24244]: (root) CMD (/usr/bin/certbot renew)
+Jul 05 14:33:15 prod-web-01 systemd[1]: disk usage warning: /var/log is 92% full
+Jul 05 14:33:26 prod-db-01 systemd[1]: disk usage warning: /var/log is 92% full
+Jul 05 14:33:28 prod-web-01 kernel: [657.375400] audit: type=1400 avc:  denied  { read }
+Jul 05 14:33:32 prod-app-01 systemd[1]: disk usage warning: /var/log is 92% full
+Jul 05 14:33:42 gateway-01 NetworkManager[25321]: <info>  [ens3]: carrier acquired
+Jul 05 14:33:49 prod-db-01 CRON[64229]: (www-data) CMD (/usr/bin/logrotate /etc/logrotate.conf)
+Jul 05 14:33:57 prod-app-01 NetworkManager[40246]: <info>  [wlan0]: carrier acquired
+Jul 05 14:33:58 prod-web-01 systemd[1]: Restarted cron.service.
+Jul 05 14:34:07 gateway-01 anacron[26097]: New session created.
+Jul 05 14:34:12 prod-app-01 NetworkManager[57022]: <info>  [wlan0]: DHCP lease renewed
+Jul 05 14:34:20 prod-web-01 systemd[1]: Started postgresql.service.
+Jul 05 14:34:34 prod-db-01 systemd[1]: disk usage warning: /var/log is 92% full
+Jul 05 14:34:38 gateway-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=78.46.89.12 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=50564 DPT=8080
+Jul 05 14:34:47 prod-app-01 systemd[1]: Reloading cron.service.
+Jul 05 14:35:07 prod-app-01 CRON[60841]: (root) CMD (/usr/bin/certbot renew)
+Jul 05 14:35:18 gateway-01 systemd[21797]: Listening on socket.
+Jul 05 14:35:36 prod-web-01 dbus-daemon[7825]: Configuration reloaded.
+Jul 05 14:35:55 gateway-01 systemd[1]: Restarted redis-server.service.
+Jul 05 14:36:09 prod-db-01 systemd-logind[55558]: Listening on socket.
+Jul 05 14:36:10 gateway-01 systemd[1]: Restarted redis-server.service.
+Jul 05 14:36:25 prod-app-01 systemd[1]: Reloading nginx.service.
+Jul 05 14:36:45 prod-db-01 NetworkManager[21472]: <info>  [eth0]: DHCP lease renewed
+Jul 05 14:36:47 prod-app-01 systemd[1]: Stopped cron.service.
+Jul 05 14:36:54 prod-web-01 systemd[1]: Stopped cron.service.
+Jul 05 14:37:09 prod-db-01 CRON[13435]: (www-data) CMD (/usr/local/bin/backup.sh)
+Jul 05 14:37:14 prod-app-01 NetworkManager[5579]: <info>  [wlan0]: link down
+Jul 05 14:37:31 prod-app-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=91.240.118.172 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=51179 DPT=3306
+Jul 05 14:37:34 prod-db-01 CRON[7554]: (root) CMD (/usr/bin/certbot renew)
+Jul 05 14:37:38 prod-app-01 kernel: [1455.982564] usb 1-1: new high-speed USB device
+Jul 05 14:37:43 prod-web-01 kernel: [6608.757560] usb 1-1: new high-speed USB device
+Jul 05 14:37:44 gateway-01 systemd[1]: Stopped docker.service.
+Jul 05 14:37:53 prod-db-01 anacron[30742]: Listening on socket.
+Jul 05 14:37:54 prod-db-01 systemd[1]: Started redis-server.service.
+Jul 05 14:38:05 gateway-01 kernel: [6174.918992] TCP: request_sock_TCP: Possible SYN flooding
+Jul 05 14:38:19 prod-db-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=78.46.89.12 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=60780 DPT=22
+Jul 05 14:38:29 prod-db-01 dbus-daemon[32766]: Session terminated.
+Jul 05 14:38:30 prod-app-01 kernel: [4829.522999] TCP: request_sock_TCP: Possible SYN flooding
+Jul 05 14:38:36 prod-app-01 systemd[1]: Started nginx.service.
+Jul 05 14:38:44 gateway-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=198.51.100.23 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=55906 DPT=23
+Jul 05 14:39:00 prod-db-01 kernel: [1902.722491] EXT4-fs (sda1): mounted filesystem with ordered data mode
+Jul 05 14:39:03 prod-db-01 CRON[11604]: (root) CMD (/usr/bin/certbot renew)
+Jul 05 14:39:22 gateway-01 kernel: [456.291015] TCP: request_sock_TCP: Possible SYN flooding
+Jul 05 14:39:25 prod-db-01 cron[1334]: Configuration reloaded.
+Jul 05 14:39:39 gateway-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=185.220.101.34 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=50234 DPT=22
+Jul 05 14:39:56 gateway-01 systemd[1]: Restarted nginx.service.
+Jul 05 14:40:00 prod-db-01 systemd[1]: Restarted redis-server.service.
+Jul 05 14:40:20 prod-app-01 CRON[61137]: (root) CMD (/usr/bin/logrotate /etc/logrotate.conf)
+Jul 05 14:40:26 prod-db-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=162.243.12.34 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=58378 DPT=22
+Jul 05 14:40:43 gateway-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=185.220.101.34 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=48548 DPT=23
+Jul 05 14:40:57 prod-db-01 anacron[18267]: Configuration reloaded.
+Jul 05 14:41:06 prod-db-01 kernel: [4612.423898] audit: type=1400 avc:  denied  { read }
+Jul 05 14:41:08 prod-app-01 CRON[11215]: (root) CMD (/usr/local/bin/backup.sh)
+Jul 05 14:41:24 prod-db-01 cron[23947]: Listening on socket.
+Jul 05 14:41:40 prod-app-01 systemd[1]: Restarted postgresql.service.
+Jul 05 14:41:47 prod-db-01 NetworkManager[14555]: <info>  [eth0]: link up
+Jul 05 14:41:58 prod-app-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=162.243.12.34 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=48105 DPT=8080
+Jul 05 14:42:13 prod-db-01 CRON[58666]: (root) CMD (/usr/bin/certbot renew)
+Jul 05 14:42:32 gateway-01 CRON[34596]: (root) CMD (/usr/local/bin/backup.sh)
+Jul 05 14:42:48 prod-web-01 anacron[29170]: New session created.
+Jul 05 14:42:51 prod-db-01 CRON[15105]: (www-data) CMD (/usr/bin/logrotate /etc/logrotate.conf)
+Jul 05 14:43:01 prod-web-01 CRON[36611]: (www-data) CMD (/usr/bin/certbot renew)
+Jul 05 14:43:05 prod-app-01 systemd[1]: disk usage warning: /var/log is 92% full
+Jul 05 14:43:21 gateway-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=103.214.56.78 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=63963 DPT=22
+Jul 05 14:43:31 prod-app-01 systemd[1]: Reloading redis-server.service.
+Jul 05 14:43:51 gateway-01 NetworkManager[1823]: <info>  [wlan0]: link down
+Jul 05 14:44:06 prod-app-01 systemd[1]: disk usage warning: /var/log is 92% full
+Jul 05 14:44:21 gateway-01 systemd[1]: Restarted postgresql.service.
+Jul 05 14:44:24 gateway-01 NetworkManager[20821]: <info>  [wlan0]: DHCP lease renewed
+Jul 05 14:44:37 prod-web-01 systemd[1]: Restarted docker.service.
+Jul 05 14:44:50 prod-app-01 CRON[6681]: (www-data) CMD (/usr/bin/certbot renew)
+Jul 05 14:45:01 prod-app-01 CRON[13527]: (root) CMD (/usr/bin/logrotate /etc/logrotate.conf)
+Jul 05 14:45:18 prod-app-01 NetworkManager[28299]: Configuration reloaded.
+Jul 05 14:45:32 prod-db-01 systemd[1]: Restarted docker.service.
+Jul 05 14:45:42 prod-db-01 systemd[1]: Stopped nginx.service.
+Jul 05 14:45:47 gateway-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=185.220.101.34 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=50127 DPT=3306
+Jul 05 14:46:06 gateway-01 kernel: [8494.185509] Out of memory: Kill process
+Jul 05 14:46:17 prod-db-01 NetworkManager[17421]: New session created.
+Jul 05 14:46:34 prod-app-01 systemd[1]: Started nginx.service.
+Jul 05 14:46:53 prod-db-01 CRON[61565]: (www-data) CMD (/usr/local/bin/backup.sh)
+Jul 05 14:47:09 gateway-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=203.0.113.45 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=46521 DPT=8080
+Jul 05 14:47:10 gateway-01 systemd[1]: disk usage warning: /var/log is 92% full
+Jul 05 14:47:27 prod-app-01 systemd[1]: disk usage warning: /var/log is 92% full
+Jul 05 14:47:28 gateway-01 CRON[20886]: (root) CMD (/usr/local/bin/backup.sh)
+Jul 05 14:47:29 prod-web-01 cron[36102]: Listening on socket.
+Jul 05 14:47:49 prod-web-01 NetworkManager[56470]: <info>  [ens3]: carrier acquired
+Jul 05 14:48:05 gateway-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=203.0.113.45 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=60960 DPT=23
+Jul 05 14:48:13 gateway-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=203.0.113.45 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=60164 DPT=443
+Jul 05 14:48:16 prod-db-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=78.46.89.12 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=43571 DPT=445
+Jul 05 14:48:24 prod-db-01 dbus-daemon[40100]: Listening on socket.
+Jul 05 14:48:33 prod-web-01 systemd[1]: Stopped cron.service.
+Jul 05 14:48:50 prod-app-01 kernel: [4265.916607] Out of memory: Kill process
+Jul 05 14:48:51 prod-app-01 kernel: [4523.123456] Kernel panic - not syncing: VFS: Unable to mount root fs
+Jul 05 14:49:04 gateway-01 systemd-logind[10536]: Service watchdog timeout.
+Jul 05 14:49:20 prod-db-01 NetworkManager[55844]: Session terminated.
+Jul 05 14:49:39 gateway-01 dbus-daemon[30208]: Session terminated.
+Jul 05 14:49:42 prod-db-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=203.0.113.45 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=64062 DPT=8080
+Jul 05 14:49:49 prod-app-01 systemd[1]: Stopped cron.service.
+Jul 05 14:49:54 gateway-01 systemd[15990]: Session terminated.
+Jul 05 14:50:10 gateway-01 kernel: [2777.854993] TCP: request_sock_TCP: Possible SYN flooding
+Jul 05 14:50:17 prod-db-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=203.0.113.45 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=43637 DPT=8080
+Jul 05 14:50:28 prod-app-01 CRON[17882]: (root) CMD (/usr/bin/logrotate /etc/logrotate.conf)
+Jul 05 14:50:41 prod-web-01 systemd[1]: disk usage warning: /var/log is 92% full
+Jul 05 14:50:44 prod-web-01 systemd[1]: Reloading nginx.service.
+Jul 05 14:50:57 prod-web-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=103.214.56.78 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=59017 DPT=445
+Jul 05 14:51:09 prod-web-01 NetworkManager[26069]: <info>  [wlan0]: link down
+Jul 05 14:51:20 prod-web-01 systemd[1]: Reloading cron.service.
+Jul 05 14:51:35 prod-db-01 CRON[22784]: (root) CMD (/usr/bin/logrotate /etc/logrotate.conf)
+Jul 05 14:51:39 gateway-01 systemd[1]: Restarted redis-server.service.
+Jul 05 14:51:50 gateway-01 systemd[1]: Started nginx.service.
+Jul 05 14:52:02 prod-app-01 kernel: [7374.375964] EXT4-fs (sda1): mounted filesystem with ordered data mode
+Jul 05 14:52:19 prod-web-01 systemd[1]: Stopped docker.service.
+Jul 05 14:52:39 prod-db-01 systemd[1]: Started redis-server.service.
+Jul 05 14:52:50 prod-app-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=45.33.32.156 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=47843 DPT=22
+Jul 05 14:53:01 gateway-01 systemd[1]: Started postgresql.service.
+Jul 05 14:53:20 prod-db-01 systemd[1]: Reloading cron.service.
+Jul 05 14:53:36 gateway-01 systemd-logind[26978]: Listening on socket.
+Jul 05 14:53:38 prod-web-01 CRON[20921]: (root) CMD (/usr/bin/certbot renew)
+Jul 05 14:53:52 gateway-01 anacron[24659]: Configuration reloaded.
+Jul 05 14:54:12 prod-app-01 kernel: [151.946672] TCP: request_sock_TCP: Possible SYN flooding
+Jul 05 14:54:27 gateway-01 NetworkManager[8290]: <info>  [wlan0]: carrier acquired
+Jul 05 14:54:42 gateway-01 kernel: [6149.242280] audit: type=1400 avc:  denied  { read }
+Jul 05 14:55:00 prod-web-01 systemd[25114]: Listening on socket.
+Jul 05 14:55:17 gateway-01 systemd[1]: Restarted cron.service.
+Jul 05 14:55:21 gateway-01 CRON[17710]: (www-data) CMD (/usr/bin/certbot renew)
+Jul 05 14:55:29 prod-app-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=45.33.32.156 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=40052 DPT=22
+Jul 05 14:55:30 prod-web-01 cron[49445]: Configuration reloaded.
+Jul 05 14:55:43 prod-db-01 systemd[1]: Restarted cron.service.
+Jul 05 14:55:54 prod-web-01 CRON[33367]: (www-data) CMD (/usr/bin/logrotate /etc/logrotate.conf)
+Jul 05 14:56:05 gateway-01 systemd[1]: Reloading nginx.service.
+Jul 05 14:56:21 prod-app-01 CRON[43877]: (www-data) CMD (/usr/bin/logrotate /etc/logrotate.conf)
+Jul 05 14:56:32 gateway-01 systemd[1]: Stopped nginx.service.
+Jul 05 14:56:41 prod-web-01 kernel: [521.097738] EXT4-fs (sda1): mounted filesystem with ordered data mode
+Jul 05 14:56:56 gateway-01 systemd[1]: Reloading postgresql.service.
+Jul 05 14:57:11 prod-web-01 systemd[1]: Reloading redis-server.service.
+Jul 05 14:57:17 prod-app-01 systemd[1]: disk usage warning: /var/log is 92% full
+Jul 05 14:57:28 prod-web-01 CRON[21058]: (www-data) CMD (/usr/bin/certbot renew)
+Jul 05 14:57:35 prod-db-01 dbus-daemon[32815]: Listening on socket.
+Jul 05 14:57:53 prod-app-01 systemd[1]: Reloading cron.service.
+Jul 05 14:57:58 gateway-01 systemd[1]: disk usage warning: /var/log is 92% full
+Jul 05 14:58:07 prod-db-01 cron[46502]: Service watchdog timeout.
+Jul 05 14:58:12 prod-app-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=103.214.56.78 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=49823 DPT=445
+Jul 05 14:58:30 prod-db-01 dhclient[61278]: Session terminated.
+Jul 05 14:58:32 prod-db-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=103.214.56.78 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=44679 DPT=80
+Jul 05 14:58:35 prod-app-01 cron[12295]: Service watchdog timeout.
+Jul 05 14:58:40 prod-db-01 systemd[1]: Reloading cron.service.
+Jul 05 14:58:49 prod-web-01 CRON[41571]: (www-data) CMD (/usr/bin/logrotate /etc/logrotate.conf)
+Jul 05 14:58:53 prod-db-01 CRON[39781]: (root) CMD (/usr/bin/logrotate /etc/logrotate.conf)
+Jul 05 14:59:13 prod-web-01 NetworkManager[32551]: <info>  [wlan0]: carrier acquired
+Jul 05 14:59:20 gateway-01 CRON[37518]: (www-data) CMD (/usr/local/bin/backup.sh)
+Jul 05 14:59:27 prod-web-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=185.220.101.34 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=55377 DPT=445
+Jul 05 14:59:42 prod-app-01 systemd-logind[7295]: Listening on socket.
+Jul 05 14:59:51 prod-app-01 systemd[1]: Stopped docker.service.
+Jul 05 14:59:52 gateway-01 NetworkManager[59256]: <info>  [eth0]: link up
+Jul 05 14:59:57 gateway-01 CRON[56594]: (www-data) CMD (/usr/bin/certbot renew)
+Jul 05 14:59:58 prod-app-01 cron[39218]: Listening on socket.
+Jul 05 14:59:59 prod-db-01 systemd[1]: Stopped nginx.service.
+Jul 05 15:00:18 prod-db-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=185.220.101.34 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=57259 DPT=443
+Jul 05 15:00:35 prod-app-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=103.214.56.78 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=43380 DPT=22
+Jul 05 15:00:45 prod-web-01 kernel: [7687.963623] Out of memory: Kill process
+Jul 05 15:01:03 prod-web-01 CRON[9658]: (root) CMD (/usr/local/bin/backup.sh)
+Jul 05 15:01:10 prod-db-01 CRON[30619]: (root) CMD (/usr/local/bin/backup.sh)
+Jul 05 15:01:13 gateway-01 systemd[1]: Restarted cron.service.
+Jul 05 15:01:16 gateway-01 CRON[58763]: (root) CMD (/usr/bin/logrotate /etc/logrotate.conf)
+Jul 05 15:01:23 gateway-01 dhclient[10668]: Service watchdog timeout.
+Jul 05 15:01:27 prod-app-01 kernel: [4186.241693] usb 1-1: new high-speed USB device
+Jul 05 15:01:40 gateway-01 systemd[1]: Restarted docker.service.
+Jul 05 15:01:50 gateway-01 CRON[27509]: (root) CMD (/usr/bin/logrotate /etc/logrotate.conf)
+Jul 05 15:01:51 prod-web-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=91.240.118.172 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=41360 DPT=23
+Jul 05 15:01:56 gateway-01 systemd-logind[59838]: Configuration reloaded.
+Jul 05 15:02:16 prod-app-01 dbus-daemon[6461]: Service watchdog timeout.
+Jul 05 15:02:32 prod-web-01 CRON[52447]: (root) CMD (/usr/bin/logrotate /etc/logrotate.conf)
+Jul 05 15:02:45 prod-web-01 NetworkManager[53652]: <info>  [wlan0]: carrier acquired
+Jul 05 15:02:54 prod-web-01 systemd[1]: Stopped cron.service.
+Jul 05 15:03:01 gateway-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=198.51.100.23 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=59827 DPT=3306
+Jul 05 15:03:10 prod-db-01 dbus-daemon[29221]: Listening on socket.
+Jul 05 15:03:21 prod-web-01 CRON[16369]: (root) CMD (/usr/bin/certbot renew)
+Jul 05 15:03:38 prod-web-01 kernel: [668.000612] TCP: request_sock_TCP: Possible SYN flooding
+Jul 05 15:03:43 gateway-01 anacron[21951]: Service watchdog timeout.
+Jul 05 15:03:49 prod-db-01 kernel: [5987.486436] EXT4-fs (sda1): mounted filesystem with ordered data mode
+Jul 05 15:04:07 prod-db-01 systemd[1]: Started docker.service.
+Jul 05 15:04:17 prod-app-01 cron[2760]: Listening on socket.
+Jul 05 15:04:19 prod-app-01 CRON[54231]: (www-data) CMD (/usr/bin/certbot renew)
+Jul 05 15:04:32 prod-web-01 dbus-daemon[7663]: Service watchdog timeout.
+Jul 05 15:04:41 prod-web-01 systemd[1]: disk usage warning: /var/log is 92% full
+Jul 05 15:04:52 gateway-01 systemd[1]: Reloading cron.service.
+Jul 05 15:05:12 gateway-01 NetworkManager[58338]: <info>  [ens3]: link down
+Jul 05 15:05:17 gateway-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=103.214.56.78 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=57227 DPT=445
+Jul 05 15:05:32 prod-db-01 systemd[1]: Started redis-server.service.
+Jul 05 15:05:37 prod-db-01 systemd[1]: Reloading docker.service.
+Jul 05 15:05:38 gateway-01 systemd[1]: Reloading postgresql.service.
+Jul 05 15:05:44 prod-web-01 CRON[2646]: (root) CMD (/usr/local/bin/backup.sh)
+Jul 05 15:06:01 prod-web-01 CRON[23311]: (root) CMD (/usr/bin/certbot renew)
+Jul 05 15:06:03 prod-web-01 kernel: [6125.541150] usb 1-1: new high-speed USB device
+Jul 05 15:06:10 prod-db-01 anacron[1961]: Service watchdog timeout.
+Jul 05 15:06:21 prod-web-01 kernel: [9969.378154] TCP: request_sock_TCP: Possible SYN flooding
+Jul 05 15:06:39 prod-db-01 systemd[1]: disk usage warning: /var/log is 92% full
+Jul 05 15:06:41 prod-web-01 CRON[44908]: (www-data) CMD (/usr/bin/logrotate /etc/logrotate.conf)
+Jul 05 15:06:57 prod-db-01 anacron[15407]: Session terminated.
+Jul 05 15:07:16 prod-db-01 systemd[1]: disk usage warning: /var/log is 92% full
+Jul 05 15:07:19 prod-db-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=203.0.113.45 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=48077 DPT=8080
+Jul 05 15:07:30 gateway-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=162.243.12.34 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=62443 DPT=22
+Jul 05 15:07:49 prod-db-01 systemd[1]: Stopped nginx.service.
+Jul 05 15:07:58 gateway-01 systemd-logind[25183]: Configuration reloaded.
+Jul 05 15:08:12 gateway-01 NetworkManager[60454]: <info>  [wlan0]: carrier acquired
+Jul 05 15:08:17 gateway-01 anacron[6547]: Session terminated.
+Jul 05 15:08:26 prod-web-01 systemd[1]: Stopped nginx.service.
+Jul 05 15:08:32 gateway-01 CRON[11340]: (www-data) CMD (/usr/bin/certbot renew)
+Jul 05 15:08:41 prod-web-01 NetworkManager[33903]: Service watchdog timeout.
+Jul 05 15:09:00 prod-app-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=162.243.12.34 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=60506 DPT=445
+Jul 05 15:09:14 prod-web-01 CRON[59215]: (www-data) CMD (/usr/bin/certbot renew)
+Jul 05 15:09:31 prod-web-01 kernel: [5962.176618] usb 1-1: new high-speed USB device
+Jul 05 15:09:34 gateway-01 NetworkManager[9736]: <info>  [ens3]: link down
+Jul 05 15:09:45 prod-web-01 dbus-daemon[39736]: Service watchdog timeout.
+Jul 05 15:10:03 prod-app-01 NetworkManager[21379]: <info>  [wlan0]: link up
+Jul 05 15:10:17 gateway-01 CRON[18772]: (root) CMD (/usr/bin/certbot renew)
+Jul 05 15:10:35 prod-web-01 CRON[25996]: (root) CMD (/usr/local/bin/backup.sh)
+Jul 05 15:10:37 prod-web-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=203.0.113.45 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=63051 DPT=443
+Jul 05 15:10:39 gateway-01 NetworkManager[63558]: <info>  [wlan0]: link down
+Jul 05 15:10:57 prod-app-01 kernel: [1292.840195] Out of memory: Kill process
+Jul 05 15:11:13 prod-db-01 dhclient[8045]: Service watchdog timeout.
+Jul 05 15:11:29 gateway-01 cron[62417]: Listening on socket.
+Jul 05 15:11:45 prod-app-01 cron[23292]: Configuration reloaded.
+Jul 05 15:12:01 prod-app-01 systemd[1]: disk usage warning: /var/log is 92% full
+Jul 05 15:12:07 gateway-01 NetworkManager[35320]: <info>  [eth0]: link down
+Jul 05 15:12:18 gateway-01 cron[20898]: Session terminated.
+Jul 05 15:12:36 prod-web-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=103.214.56.78 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=51294 DPT=3306
+Jul 05 15:12:37 prod-db-01 kernel: [8803.430759] Out of memory: Kill process
+Jul 05 15:12:44 prod-web-01 NetworkManager[15574]: <info>  [eth0]: link down
+Jul 05 15:12:47 prod-app-01 systemd[1]: Restarted cron.service.
+Jul 05 15:12:50 prod-web-01 NetworkManager[29410]: <info>  [ens3]: link down
+Jul 05 15:12:59 gateway-01 systemd-logind[49761]: Service watchdog timeout.
+Jul 05 15:13:11 prod-web-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=203.0.113.45 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=55311 DPT=3306
+Jul 05 15:13:29 prod-app-01 systemd[1]: disk usage warning: /var/log is 92% full
+Jul 05 15:13:33 gateway-01 systemd[1]: Restarted postgresql.service.
+Jul 05 15:13:41 prod-web-01 systemd[39970]: Configuration reloaded.
+Jul 05 15:13:43 prod-db-01 systemd[1]: Reloading nginx.service.
+Jul 05 15:13:45 prod-db-01 NetworkManager[8726]: <info>  [eth0]: link up
+Jul 05 15:13:56 prod-app-01 systemd-logind[22527]: Configuration reloaded.
+Jul 05 15:14:08 prod-db-01 systemd[1]: Restarted redis-server.service.
+Jul 05 15:14:12 gateway-01 CRON[25391]: (root) CMD (/usr/bin/certbot renew)
+Jul 05 15:14:17 prod-app-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=185.220.101.34 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=58958 DPT=443
+Jul 05 15:14:23 prod-db-01 systemd[1]: Reloading docker.service.
+Jul 05 15:14:24 prod-db-01 kernel: [8901.654321] EXT4-fs error: no space left on device
+Jul 05 15:14:33 prod-web-01 dbus-daemon[56536]: Service watchdog timeout.
+Jul 05 15:14:36 prod-web-01 dhclient[60613]: Configuration reloaded.
+Jul 05 15:14:49 prod-app-01 systemd[1]: Restarted postgresql.service.
+Jul 05 15:15:08 prod-db-01 dbus-daemon[3283]: Configuration reloaded.
+Jul 05 15:15:25 prod-web-01 systemd[1]: Started nginx.service.
+Jul 05 15:15:34 prod-web-01 NetworkManager[7575]: <info>  [ens3]: DHCP lease renewed
+Jul 05 15:15:45 prod-db-01 kernel: [1519.037050] usb 1-1: new high-speed USB device
+Jul 05 15:15:56 prod-app-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=78.46.89.12 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=49760 DPT=445
+Jul 05 15:16:05 prod-db-01 anacron[11638]: Service watchdog timeout.
+Jul 05 15:16:24 prod-web-01 systemd[1]: Reloading nginx.service.
+Jul 05 15:16:41 prod-app-01 CRON[27691]: (www-data) CMD (/usr/local/bin/backup.sh)
+Jul 05 15:17:00 prod-app-01 CRON[57256]: (www-data) CMD (/usr/local/bin/backup.sh)
+Jul 05 15:17:15 prod-app-01 CRON[25573]: (www-data) CMD (/usr/bin/logrotate /etc/logrotate.conf)
+Jul 05 15:17:21 prod-web-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=103.214.56.78 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=60435 DPT=80
+Jul 05 15:17:31 prod-db-01 kernel: [6510.542351] TCP: request_sock_TCP: Possible SYN flooding
+Jul 05 15:17:50 gateway-01 systemd[1]: Restarted cron.service.
+Jul 05 15:18:02 prod-web-01 systemd[1]: Stopped redis-server.service.
+Jul 05 15:18:16 prod-web-01 CRON[9065]: (root) CMD (/usr/bin/certbot renew)
+Jul 05 15:18:31 gateway-01 systemd[1]: disk usage warning: /var/log is 92% full
+Jul 05 15:18:36 prod-app-01 systemd[35603]: Configuration reloaded.
+Jul 05 15:18:49 prod-web-01 systemd[1]: disk usage warning: /var/log is 92% full
+Jul 05 15:19:00 gateway-01 systemd-logind[61168]: Service watchdog timeout.
+Jul 05 15:19:02 gateway-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=203.0.113.45 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=44450 DPT=80
+Jul 05 15:19:14 prod-web-01 systemd[1]: Started docker.service.
+Jul 05 15:19:24 gateway-01 CRON[54199]: (www-data) CMD (/usr/bin/certbot renew)
+Jul 05 15:19:37 prod-app-01 NetworkManager[39654]: <info>  [eth0]: link up
+Jul 05 15:19:50 gateway-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=162.243.12.34 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=54739 DPT=22
+Jul 05 15:19:55 gateway-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=91.240.118.172 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=45060 DPT=3306
+Jul 05 15:20:05 prod-db-01 systemd-logind[24930]: Session terminated.
+Jul 05 15:20:24 prod-web-01 systemd[1]: Reloading redis-server.service.
+Jul 05 15:20:31 gateway-01 systemd[1]: Reloading redis-server.service.
+Jul 05 15:20:35 prod-web-01 systemd[1]: Reloading postgresql.service.
+Jul 05 15:20:42 gateway-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=91.240.118.172 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=46671 DPT=23
+Jul 05 15:20:55 prod-db-01 systemd[1]: disk usage warning: /var/log is 92% full
+Jul 05 15:20:56 prod-web-01 systemd[1]: Started cron.service.
+Jul 05 15:21:04 prod-db-01 cron[28541]: Session terminated.
+Jul 05 15:21:22 prod-web-01 systemd[1]: disk usage warning: /var/log is 92% full
+Jul 05 15:21:23 prod-app-01 NetworkManager[1178]: <info>  [ens3]: carrier acquired
+Jul 05 15:21:29 gateway-01 systemd[1]: Started docker.service.
+Jul 05 15:21:40 prod-app-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=203.0.113.45 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=54141 DPT=443
+Jul 05 15:21:41 prod-app-01 NetworkManager[51072]: <info>  [wlan0]: carrier acquired
+Jul 05 15:21:43 prod-db-01 anacron[45933]: New session created.
+Jul 05 15:21:57 gateway-01 CRON[40731]: (www-data) CMD (/usr/bin/certbot renew)
+Jul 05 15:22:08 prod-app-01 CRON[60292]: (root) CMD (/usr/bin/certbot renew)
+Jul 05 15:22:10 prod-app-01 CRON[64857]: (www-data) CMD (/usr/bin/certbot renew)
+Jul 05 15:22:27 prod-web-01 CRON[3993]: (www-data) CMD (/usr/bin/logrotate /etc/logrotate.conf)
+Jul 05 15:22:29 prod-web-01 CRON[24812]: (www-data) CMD (/usr/local/bin/backup.sh)
+Jul 05 15:22:49 prod-app-01 systemd[1]: Restarted docker.service.
+Jul 05 15:22:52 prod-db-01 NetworkManager[37591]: <info>  [ens3]: link up
+Jul 05 15:22:57 prod-app-01 systemd[1]: Stopped redis-server.service.
+Jul 05 15:23:17 prod-db-01 dbus-daemon[46474]: Configuration reloaded.
+Jul 05 15:23:24 prod-web-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=103.214.56.78 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=49450 DPT=23
+Jul 05 15:23:35 prod-app-01 systemd[1]: Restarted postgresql.service.
+Jul 05 15:23:47 prod-app-01 NetworkManager[33875]: <info>  [eth0]: DHCP lease renewed
+Jul 05 15:23:53 gateway-01 systemd-logind[14980]: Listening on socket.
+Jul 05 15:24:04 gateway-01 systemd[1]: Reloading nginx.service.
+Jul 05 15:24:05 prod-db-01 systemd[25505]: New session created.
+Jul 05 15:24:07 prod-db-01 systemd[1]: Reloading postgresql.service.
+Jul 05 15:24:10 prod-web-01 CRON[18170]: (root) CMD (/usr/local/bin/backup.sh)
+Jul 05 15:24:20 prod-app-01 CRON[45032]: (root) CMD (/usr/bin/certbot renew)
+Jul 05 15:24:23 prod-web-01 NetworkManager[6007]: <info>  [wlan0]: DHCP lease renewed
+Jul 05 15:24:26 gateway-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=45.33.32.156 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=56039 DPT=22
+Jul 05 15:24:44 gateway-01 kernel: [3806.773004] TCP: request_sock_TCP: Possible SYN flooding
+Jul 05 15:24:55 gateway-01 CRON[16700]: (root) CMD (/usr/bin/certbot renew)
+Jul 05 15:24:57 prod-web-01 NetworkManager[37212]: <info>  [wlan0]: link down
+Jul 05 15:25:11 prod-db-01 systemd[51358]: Configuration reloaded.
+Jul 05 15:25:13 gateway-01 systemd[1]: Stopped docker.service.
+Jul 05 15:25:28 prod-web-01 dhclient[21670]: Listening on socket.
+Jul 05 15:25:34 prod-app-01 systemd[1]: Started postgresql.service.
+Jul 05 15:25:45 gateway-01 systemd-logind[11865]: Service watchdog timeout.
+Jul 05 15:25:53 prod-web-01 CRON[49278]: (root) CMD (/usr/bin/certbot renew)
+Jul 05 15:25:55 prod-app-01 CRON[22728]: (root) CMD (/usr/bin/certbot renew)
+Jul 05 15:26:07 gateway-01 NetworkManager[34197]: <info>  [ens3]: link down
+Jul 05 15:26:19 gateway-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=45.33.32.156 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=55533 DPT=8080
+Jul 05 15:26:37 prod-web-01 systemd[1]: disk usage warning: /var/log is 92% full
+Jul 05 15:26:39 prod-app-01 kernel: [2618.960828] Out of memory: Kill process
+Jul 05 15:26:58 prod-app-01 dhclient[19375]: Listening on socket.
+Jul 05 15:27:17 prod-web-01 CRON[50218]: (www-data) CMD (/usr/bin/logrotate /etc/logrotate.conf)
+Jul 05 15:27:25 prod-web-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=78.46.89.12 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=48784 DPT=22
+Jul 05 15:27:30 prod-db-01 systemd[1]: disk usage warning: /var/log is 92% full
+Jul 05 15:27:37 gateway-01 NetworkManager[7703]: <info>  [wlan0]: link down
+Jul 05 15:27:39 gateway-01 systemd[1]: Reloading cron.service.
+Jul 05 15:27:57 prod-db-01 NetworkManager[1310]: Listening on socket.
+Jul 05 15:28:06 prod-web-01 anacron[29443]: Service watchdog timeout.
+Jul 05 15:28:21 gateway-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=78.46.89.12 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=50188 DPT=445
+Jul 05 15:28:36 prod-db-01 CRON[3757]: (root) CMD (/usr/bin/logrotate /etc/logrotate.conf)
+Jul 05 15:28:45 prod-web-01 CRON[63713]: (root) CMD (/usr/local/bin/backup.sh)
+Jul 05 15:28:50 prod-app-01 kernel: [6249.084705] Out of memory: Kill process
+Jul 05 15:29:09 prod-app-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=203.0.113.45 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=52905 DPT=443
+Jul 05 15:29:19 gateway-01 dhclient[17101]: Service watchdog timeout.
+Jul 05 15:29:27 gateway-01 NetworkManager[33829]: <info>  [eth0]: link down
+Jul 05 15:29:35 gateway-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=203.0.113.45 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=61073 DPT=80
+Jul 05 15:29:51 prod-db-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=198.51.100.23 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=51868 DPT=443
+Jul 05 15:29:58 prod-db-01 systemd[1]: disk usage warning: /var/log is 92% full
+Jul 05 15:30:09 prod-web-01 CRON[7348]: (www-data) CMD (/usr/bin/certbot renew)
+Jul 05 15:30:17 prod-db-01 kernel: [273.828434] audit: type=1400 avc:  denied  { read }
+Jul 05 15:30:23 prod-app-01 NetworkManager[43177]: <info>  [eth0]: carrier acquired
+Jul 05 15:30:34 gateway-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=185.220.101.34 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=43641 DPT=80
+Jul 05 15:30:45 prod-db-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=185.220.101.34 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=61285 DPT=80
+Jul 05 15:31:02 gateway-01 systemd[1]: Started cron.service.
+Jul 05 15:31:04 gateway-01 systemd-logind[51085]: Listening on socket.
+Jul 05 15:31:21 prod-web-01 dbus-daemon[19640]: Session terminated.
+Jul 05 15:31:40 prod-web-01 systemd[1]: disk usage warning: /var/log is 92% full
+Jul 05 15:31:47 prod-app-01 CRON[24085]: (root) CMD (/usr/bin/certbot renew)
+Jul 05 15:32:05 gateway-01 cron[47788]: Configuration reloaded.
+Jul 05 15:32:15 prod-app-01 kernel: [510.774938] EXT4-fs (sda1): mounted filesystem with ordered data mode
+Jul 05 15:32:20 gateway-01 systemd[1]: disk usage warning: /var/log is 92% full
+Jul 05 15:32:21 gateway-01 systemd[1]: Restarted redis-server.service.
+Jul 05 15:32:38 prod-db-01 NetworkManager[4767]: <info>  [eth0]: link up
+Jul 05 15:32:58 prod-db-01 NetworkManager[39646]: Listening on socket.
+Jul 05 15:33:05 prod-db-01 CRON[62452]: (root) CMD (/usr/bin/logrotate /etc/logrotate.conf)
+Jul 05 15:33:14 prod-web-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=203.0.113.45 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=46183 DPT=22
+Jul 05 15:33:32 gateway-01 systemd-logind[32310]: New session created.
+Jul 05 15:33:43 prod-db-01 CRON[48116]: (www-data) CMD (/usr/bin/certbot renew)
+Jul 05 15:33:49 gateway-01 NetworkManager[3849]: <info>  [wlan0]: DHCP lease renewed
+Jul 05 15:34:01 prod-app-01 systemd[1]: Started postgresql.service.
+Jul 05 15:34:13 prod-app-01 systemd[1]: Restarted nginx.service.
+Jul 05 15:34:32 prod-app-01 systemd[1]: Started postgresql.service.
+Jul 05 15:34:36 prod-web-01 systemd[1]: Started cron.service.
+Jul 05 15:34:45 gateway-01 cron[4642]: Session terminated.
+Jul 05 15:34:57 gateway-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=78.46.89.12 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=49554 DPT=8080
+Jul 05 15:35:16 prod-db-01 systemd[1]: disk usage warning: /var/log is 92% full
+Jul 05 15:35:32 prod-app-01 systemd-logind[24580]: Configuration reloaded.
+Jul 05 15:35:52 gateway-01 systemd-logind[16871]: Configuration reloaded.
+Jul 05 15:35:57 prod-app-01 systemd[1]: Stopped postgresql.service.
+Jul 05 15:36:03 gateway-01 dhclient[33307]: Session terminated.
+Jul 05 15:36:16 prod-app-01 CRON[28700]: (root) CMD (/usr/bin/logrotate /etc/logrotate.conf)
+Jul 05 15:36:33 prod-db-01 systemd[1]: Started docker.service.
+Jul 05 15:36:49 prod-db-01 systemd[1]: Restarted cron.service.
+Jul 05 15:36:54 prod-db-01 CRON[21017]: (root) CMD (/usr/bin/logrotate /etc/logrotate.conf)
+Jul 05 15:37:08 prod-db-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=185.220.101.34 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=46620 DPT=23
+Jul 05 15:37:23 prod-app-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=103.214.56.78 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=52227 DPT=22
+Jul 05 15:37:29 prod-db-01 CRON[20547]: (www-data) CMD (/usr/local/bin/backup.sh)
+Jul 05 15:37:43 gateway-01 NetworkManager[42963]: Service watchdog timeout.
+Jul 05 15:37:44 gateway-01 systemd[1]: Stopped postgresql.service.
+Jul 05 15:38:01 prod-db-01 CRON[37788]: (root) CMD (/usr/local/bin/backup.sh)
+Jul 05 15:38:18 prod-app-01 kernel: [7232.090248] usb 1-1: new high-speed USB device
+Jul 05 15:38:20 prod-web-01 CRON[5812]: (www-data) CMD (/usr/bin/logrotate /etc/logrotate.conf)
+Jul 05 15:38:27 prod-db-01 anacron[45584]: Listening on socket.
+Jul 05 15:38:47 prod-web-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=78.46.89.12 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=42769 DPT=3306
+Jul 05 15:38:50 prod-web-01 systemd[1]: Started cron.service.
+Jul 05 15:38:54 prod-db-01 cron[38915]: Session terminated.
+Jul 05 15:39:09 prod-db-01 systemd[1]: Started cron.service.
+Jul 05 15:39:26 gateway-01 CRON[48960]: (root) CMD (/usr/bin/logrotate /etc/logrotate.conf)
+Jul 05 15:39:38 prod-db-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=00:00:00:00:00:00 SRC=91.240.118.172 DST=192.168.1.10 LEN=60 TOS=0x00 TTL=64 PROTO=TCP SPT=63521 DPT=23
+Jul 05 15:39:46 prod-db-01 systemd[1]: Reloading postgresql.service.
+Jul 05 15:40:01 gateway-01 systemd-logind[58907]: Configuration reloaded.
+Jul 05 15:40:02 prod-app-01 anacron[17776]: Service watchdog timeout.
+Jul 05 15:40:19 prod-db-01 CRON[59649]: (www-data) CMD (/usr/bin/logrotate /etc/logrotate.conf)
