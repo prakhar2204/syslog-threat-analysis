@@ -2,10 +2,19 @@
 SysLog Threat Analysis — Configuration Module
 
 Centralized constants, thresholds, and settings used across
-the entire backend pipeline.
+the entire backend pipeline. Supports environment variable
+overrides for production deployment.
 """
 
+import os
 from pathlib import Path
+
+# Load .env file if present (development convenience)
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
 
 # ---------------------------------------------------------------------------
 # Project metadata
@@ -107,10 +116,21 @@ DEFAULT_REFRESH_INTERVAL = 2  # seconds
 LOG_TAIL_POLL_INTERVAL = 0.2  # seconds between file checks
 
 # ---------------------------------------------------------------------------
+# Server configuration
+# ---------------------------------------------------------------------------
+PORT = int(os.environ.get("PORT", "8000"))
+
+# ---------------------------------------------------------------------------
 # Frontend connection
 # ---------------------------------------------------------------------------
-CORS_ORIGINS = [
+_default_origins = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
     "http://localhost:3000",
 ]
+_env_origins = os.environ.get("CORS_ORIGINS", "")
+CORS_ORIGINS = _default_origins + (
+    [o.strip() for o in _env_origins.split(",") if o.strip()]
+    if _env_origins else []
+)
+

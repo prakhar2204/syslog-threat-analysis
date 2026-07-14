@@ -1,6 +1,6 @@
 /* SysLog Threat Analysis — Global Application State */
 
-import { createContext, useContext, useCallback, useReducer, type ReactNode } from 'react';
+import { createContext, useContext, useCallback, useEffect, useReducer, useRef, type ReactNode } from 'react';
 import type { Alert, DashboardStats, Incident, LogEntry, WSMessage } from '../types';
 import { useWebSocket } from '../hooks/useWebSocket';
 
@@ -87,9 +87,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const { connected } = useWebSocket(handleWS);
 
-  if (connected !== state.wsConnected) {
-    dispatch({ type: 'SET_WS', payload: connected });
-  }
+  // Track previous connection state to avoid dispatching during render
+  const prevConnected = useRef(connected);
+  useEffect(() => {
+    if (prevConnected.current !== connected) {
+      prevConnected.current = connected;
+      dispatch({ type: 'SET_WS', payload: connected });
+    }
+  }, [connected]);
 
   return (
     <AppContext.Provider value={{ state, dispatch }}>

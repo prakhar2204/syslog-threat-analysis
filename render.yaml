@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: syslog-threat-analysis-api
+    runtime: python
+    region: oregon
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: LOG_LEVEL
+        value: INFO
+      - key: CORS_ORIGINS
+        value: https://syslog-threat-analysis.netlify.app
+      - key: PYTHON_VERSION
+        value: 3.11.0

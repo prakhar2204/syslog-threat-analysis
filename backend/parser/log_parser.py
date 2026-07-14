@@ -78,11 +78,12 @@ class LogParser:
     """
     Parses raw log lines into normalized LogEntry objects.
 
-    Usage:
+    Usage::
+
         parser = LogParser()
         entry = parser.parse_line("Jul  5 09:14:23 server sshd[1234]: Failed password for root")
         if entry:
-            print(entry.severity, entry.event_type)
+            logger.info("%s %s", entry.severity, entry.event_type)
     """
 
     def __init__(self) -> None:

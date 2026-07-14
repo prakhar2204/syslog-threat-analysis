@@ -2,7 +2,9 @@
 
 import type { Alert, DashboardStats, Incident, LogDetail, LogFile, MonitoringStatus, PaginatedLogs } from '../types';
 
-const BASE = '/api';
+const BASE = import.meta.env.VITE_API_BASE_URL
+  ? `${import.meta.env.VITE_API_BASE_URL}/api`
+  : '/api';
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {

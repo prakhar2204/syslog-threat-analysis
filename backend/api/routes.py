@@ -262,7 +262,7 @@ async def export_report(fmt: str):
         try:
             content = exporter.export_pdf(stats, pipeline.incidents, pipeline.alerts)
             return Response(
-                content=content,
+                content=bytes(content),
                 media_type="application/pdf",
                 headers={"Content-Disposition": "attachment; filename=syslog_threat_report.pdf"},
             )

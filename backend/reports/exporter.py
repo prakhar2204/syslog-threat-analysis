@@ -96,7 +96,7 @@ class ReportExporter:
         pdf.set_font("Helvetica", "B", 18)
         pdf.cell(0, 12, PROJECT_NAME, ln=True, align="C")
         pdf.set_font("Helvetica", "", 10)
-        pdf.cell(0, 6, f"Incident Report — {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", ln=True, align="C")
+        pdf.cell(0, 6, f"Incident Report - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", ln=True, align="C")
         pdf.ln(8)
 
         # Statistics section
@@ -123,7 +123,7 @@ class ReportExporter:
 
         for inc in incidents[:20]:
             pdf.set_font("Helvetica", "B", 10)
-            pdf.cell(0, 6, f"[{inc.severity.value}] {inc.incident_type} — {inc.incident_id}", ln=True)
+            pdf.cell(0, 6, f"[{inc.severity.value}] {inc.incident_type} - {inc.incident_id}", ln=True)
             pdf.set_font("Helvetica", "", 9)
             pdf.cell(0, 5, f"  Confidence: {inc.confidence}% | Risk: {inc.risk} | Events: {inc.total_events}", ln=True)
             pdf.cell(0, 5, f"  Source IPs: {', '.join(inc.source_ips[:5])}", ln=True)
@@ -131,13 +131,15 @@ class ReportExporter:
 
             if inc.reasoning:
                 pdf.set_font("Helvetica", "I", 9)
-                pdf.multi_cell(0, 5, f"  Reasoning: {inc.reasoning[:300]}")
+                safe_reason = inc.reasoning[:300].encode("ascii", "replace").decode("ascii")
+                pdf.multi_cell(0, 5, f"  Reasoning: {safe_reason}")
 
             if inc.recommendations:
                 pdf.set_font("Helvetica", "", 9)
                 pdf.cell(0, 5, "  Recommendations:", ln=True)
                 for rec in inc.recommendations[:5]:
-                    pdf.cell(0, 5, f"    • {rec}", ln=True)
+                    safe_rec = rec.encode("ascii", "replace").decode("ascii")
+                    pdf.cell(0, 5, f"    - {safe_rec}", ln=True)
 
             pdf.ln(4)
 
@@ -150,8 +152,8 @@ class ReportExporter:
             pdf.set_font("Helvetica", "", 9)
             pdf.cell(
                 0, 5,
-                f"[{alert.severity.value}] {alert.rule_name} — "
-                f"IP: {alert.source_ip or 'N/A'} — {alert.timestamp.strftime('%H:%M:%S')}",
+                f"[{alert.severity.value}] {alert.rule_name} - "
+                f"IP: {alert.source_ip or 'N/A'} - {alert.timestamp.strftime('%H:%M:%S')}",
                 ln=True,
             )
 

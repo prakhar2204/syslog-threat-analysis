@@ -5,7 +5,10 @@ __pycache__/
 *.pyd
 .venv/
 venv/
-.env
+
+# Environment files (keep templates, ignore local overrides)
+backend/.env
+!backend/.env.example
 
 # Node
 node_modules/
@@ -28,3 +31,6 @@ backend/exports/
 
 # Python cache
 .pytest_cache/
+
+# Vite
+frontend/dist/
