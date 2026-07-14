@@ -14,6 +14,6 @@ services:
       - key: LOG_LEVEL
         value: INFO
       - key: CORS_ORIGINS
-        value: https://syslog-threat-analysis.netlify.app
+        value: https://syslogthreatanalysis-dev-only.netlify.app/
       - key: PYTHON_VERSION
         value: 3.11.0
