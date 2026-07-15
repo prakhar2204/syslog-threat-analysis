@@ -1,5 +1,5 @@
 """
-SysLog Threat Analysis — API Schemas
+SysLog Threat Analysis - API Schemas
 
 Pydantic models for API request/response validation.
 """
@@ -12,18 +12,31 @@ from pydantic import BaseModel
 
 
 class MonitorStartRequest(BaseModel):
-    file_path: str
+    file_path: str = ""
+    folder: str = ""
     from_beginning: bool = True
 
 
 class MonitorStopResponse(BaseModel):
     status: str
-    lines_processed: int
+    lines_processed: int = 0
 
 
 class AlertActionRequest(BaseModel):
     alert_id: str
     action: str  # "acknowledge" or "resolve"
+
+
+class SimulationStartRequest(BaseModel):
+    scenarios: Optional[list[str]] = None
+    speed: str = "normal"
+    target_user: str = "admin"
+    randomize_ips: bool = True
+
+
+class SimulationGenerateRequest(BaseModel):
+    scenarios: Optional[list[str]] = None
+    target_user: str = "admin"
 
 
 class LogQueryParams(BaseModel):

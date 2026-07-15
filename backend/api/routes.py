@@ -1,5 +1,5 @@
 """
-SysLog Threat Analysis — REST API Routes
+SysLog Threat Analysis - REST API Routes
 
 All HTTP endpoints for the dashboard frontend.
 Security logic stays in the backend pipeline — the API
@@ -15,24 +15,38 @@ from typing import Optional
 from fastapi import APIRouter, HTTPException, Query
 from fastapi.responses import Response
 
-from api.schemas import AlertActionRequest, MonitorStartRequest, MonitorStopResponse
+from api.schemas import (
+    AlertActionRequest,
+    MonitorStartRequest,
+    MonitorStopResponse,
+    SimulationGenerateRequest,
+    SimulationStartRequest,
+)
 from config import LOG_WATCH_DIRS, SAMPLE_LOGS_DIR
 from reports.exporter import ReportExporter
 from services.pipeline import pipeline
-from services.log_watcher import LogWatcher
+from services.monitoring import MonitorManager
+from services.simulator import SimulatorEngine, SimSpeed, SCENARIOS
 from utils.helpers import get_log_files
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api")
 
-# Shared watcher instance (managed at app level, referenced here)
-_watcher: Optional[LogWatcher] = None
+# Shared instances (injected from main.py via set_*)
+_monitor: Optional[MonitorManager] = None
+_simulator: Optional[SimulatorEngine] = None
 
 
-def set_watcher(watcher: LogWatcher) -> None:
-    """Inject the log watcher instance from main.py."""
-    global _watcher
-    _watcher = watcher
+def set_monitor(monitor: MonitorManager) -> None:
+    """Inject the monitor manager from main.py."""
+    global _monitor
+    _monitor = monitor
+
+
+def set_simulator(sim: SimulatorEngine) -> None:
+    """Inject the simulator from main.py."""
+    global _simulator
+    _simulator = sim
 
 
 # ---------------------------------------------------------------------------
@@ -172,54 +186,242 @@ async def get_incident_detail(incident_id: str):
 
 @router.get("/monitor/status")
 async def monitor_status():
-    """Get current monitoring status."""
-    return {
-        "active": _watcher.is_active if _watcher else False,
-        "file_path": _watcher.file_path if _watcher else "",
-        "lines_processed": _watcher.lines_processed if _watcher else 0,
-        "last_event_time": (
-            pipeline.monitoring.last_event_time.isoformat()
-            if pipeline.monitoring.last_event_time
-            else None
-        ),
-    }
+    """Full monitoring status including session, folder, EPS, uptime."""
+    if _monitor is None:
+        return {"active": False, "error": "Monitor not initialized"}
+    return _monitor.get_status()
 
 
 @router.post("/monitor/start")
 async def start_monitoring(request: MonitorStartRequest):
-    """Start monitoring a log file."""
-    if _watcher is None:
-        raise HTTPException(status_code=500, detail="Watcher not initialized")
+    """Start monitoring a folder or file."""
+    if _monitor is None:
+        raise HTTPException(status_code=500, detail="Monitor not initialized")
 
-    file_path = request.file_path
-    if not Path(file_path).exists():
-        raise HTTPException(status_code=404, detail=f"File not found: {file_path}")
+    if request.folder:
+        result = await _monitor.start_folder_monitoring(request.folder)
+    elif request.file_path:
+        if not Path(request.file_path).exists():
+            raise HTTPException(status_code=404, detail=f"File not found: {request.file_path}")
+        result = await _monitor.start_file_monitoring(request.file_path, request.from_beginning)
+    else:
+        # Default: monitor sample_logs folder
+        result = await _monitor.start_folder_monitoring()
 
-    try:
-        await _watcher.start(
-            file_path,
-            on_new_lines=pipeline.process_lines,
-            from_beginning=request.from_beginning,
-        )
-        pipeline.monitoring.active = True
-        pipeline.monitoring.file_path = file_path
-    except Exception as exc:
-        raise HTTPException(status_code=500, detail=str(exc))
-
-    return {"status": "started", "file_path": file_path}
+    return result
 
 
 @router.post("/monitor/stop")
 async def stop_monitoring():
-    """Stop monitoring the current log file."""
-    if _watcher is None or not _watcher.is_active:
-        return MonitorStopResponse(status="already_stopped", lines_processed=0)
+    """Stop monitoring the current source."""
+    if _monitor is None:
+        return MonitorStopResponse(status="not_initialized")
+    result = await _monitor.stop_monitoring()
+    return result
 
-    lines = _watcher.lines_processed
-    await _watcher.stop()
-    pipeline.monitoring.active = False
 
-    return MonitorStopResponse(status="stopped", lines_processed=lines)
+@router.post("/monitor/pause")
+async def pause_monitoring():
+    """Pause monitoring without ending the session."""
+    if _monitor is None:
+        raise HTTPException(status_code=500, detail="Monitor not initialized")
+    return await _monitor.pause_monitoring()
+
+
+@router.post("/monitor/resume")
+async def resume_monitoring():
+    """Resume a paused monitoring session."""
+    if _monitor is None:
+        raise HTTPException(status_code=500, detail="Monitor not initialized")
+    return await _monitor.resume_monitoring()
+
+
+@router.get("/monitor/session")
+async def get_current_session():
+    """Get current monitoring session details."""
+    if _monitor is None or _monitor.current_session is None:
+        return {"session": None}
+    return _monitor.current_session.to_dict()
+
+
+@router.get("/monitor/history")
+async def get_session_history():
+    """Get all completed monitoring sessions."""
+    if _monitor is None:
+        return []
+    return _monitor.get_session_history()
+
+
+@router.get("/monitor/pipeline")
+async def get_pipeline_stats():
+    """Live pipeline flow statistics."""
+    if _monitor is None:
+        return {}
+    return _monitor.get_pipeline_stats()
+
+
+# ---------------------------------------------------------------------------
+# Attack Simulation
+# ---------------------------------------------------------------------------
+
+@router.get("/simulation/scenarios")
+async def list_scenarios():
+    """List all available attack simulation scenarios."""
+    return [
+        {
+            "id": sid,
+            "name": s["name"],
+            "description": s["description"],
+            "category": s["category"],
+        }
+        for sid, s in SCENARIOS.items()
+    ]
+
+
+@router.post("/simulation/start")
+async def start_simulation(request: SimulationStartRequest):
+    """Start continuous attack simulation."""
+    if _simulator is None:
+        raise HTTPException(status_code=500, detail="Simulator not initialized")
+
+    try:
+        speed = SimSpeed(request.speed)
+    except ValueError:
+        raise HTTPException(status_code=400, detail=f"Invalid speed: {request.speed}. Use slow, normal, fast, very_fast")
+
+    await _simulator.start(
+        scenarios=request.scenarios,
+        speed=speed,
+        target_user=request.target_user,
+        randomize_ips=request.randomize_ips,
+    )
+    return {"status": "started", "speed": speed.value}
+
+
+@router.post("/simulation/stop")
+async def stop_simulation():
+    """Stop continuous simulation."""
+    if _simulator is None:
+        return {"status": "not_initialized"}
+    await _simulator.stop()
+    return {"status": "stopped", "events_generated": _simulator.events_generated}
+
+
+@router.post("/simulation/reset")
+async def reset_simulation():
+    """Reset simulation state and clear simulation log."""
+    if _simulator is None:
+        return {"status": "not_initialized"}
+    _simulator.reset()
+    return {"status": "reset"}
+
+
+@router.post("/simulation/generate")
+async def generate_once(request: SimulationGenerateRequest):
+    """Generate a single batch of attack logs."""
+    if _simulator is None:
+        raise HTTPException(status_code=500, detail="Simulator not initialized")
+    count = _simulator.generate_once(
+        scenarios=request.scenarios,
+        target_user=request.target_user,
+    )
+    return {"status": "generated", "lines": count}
+
+
+@router.get("/simulation/status")
+async def simulation_status():
+    """Get current simulation state."""
+    if _simulator is None:
+        return {"active": False}
+    return _simulator.status()
+
+
+
+# ---------------------------------------------------------------------------
+# Evidence
+# ---------------------------------------------------------------------------
+
+@router.get("/evidence")
+async def list_evidence(
+    rule_id: Optional[str] = Query(None),
+    severity: Optional[str] = Query(None),
+    source_ip: Optional[str] = Query(None),
+    username: Optional[str] = Query(None),
+    service: Optional[str] = Query(None),
+):
+    """List all evidence objects, optionally filtered."""
+    if rule_id or severity or source_ip or username or service:
+        results = pipeline.evidence_engine.search_evidence(
+            rule_id=rule_id, severity=severity, source_ip=source_ip,
+            username=username, service=service,
+        )
+    else:
+        results = pipeline.evidence_engine.evidence_list
+    return [e.model_dump(mode="json") for e in results]
+
+
+@router.get("/evidence/search")
+async def search_evidence(
+    rule_id: Optional[str] = Query(None),
+    severity: Optional[str] = Query(None),
+    source_ip: Optional[str] = Query(None),
+    username: Optional[str] = Query(None),
+    service: Optional[str] = Query(None),
+    ioc: Optional[str] = Query(None),
+    keyword: Optional[str] = Query(None),
+):
+    """Search evidence by various criteria."""
+    results = pipeline.evidence_engine.search_evidence(
+        rule_id=rule_id, severity=severity, source_ip=source_ip,
+        username=username, service=service, ioc=ioc, keyword=keyword,
+    )
+    return [e.model_dump(mode="json") for e in results]
+
+
+@router.get("/evidence/by-incident/{incident_id}")
+async def get_evidence_by_incident(incident_id: str):
+    """Get evidence linked to a specific incident."""
+    evidence = pipeline.evidence_engine.get_evidence_by_incident(incident_id)
+    if evidence is None:
+        raise HTTPException(status_code=404, detail="Evidence not found for incident")
+    return evidence.model_dump(mode="json")
+
+
+@router.get("/evidence/{evidence_id}")
+async def get_evidence_detail(evidence_id: str):
+    """Get a single evidence object by ID."""
+    evidence = pipeline.evidence_engine.get_evidence(evidence_id)
+    if evidence is None:
+        raise HTTPException(status_code=404, detail="Evidence not found")
+    return evidence.model_dump(mode="json")
+
+
+# ---------------------------------------------------------------------------
+# Observations
+# ---------------------------------------------------------------------------
+
+@router.get("/observations")
+async def list_observations():
+    """List all observations."""
+    return [o.model_dump(mode="json") for o in pipeline.evidence_engine.observations]
+
+
+@router.get("/observations/{observation_id}")
+async def get_observation_detail(observation_id: str):
+    """Get a single observation by ID."""
+    obs = pipeline.evidence_engine.get_observation(observation_id)
+    if obs is None:
+        raise HTTPException(status_code=404, detail="Observation not found")
+    return obs.model_dump(mode="json")
+
+
+@router.post("/observations/promote")
+async def promote_observation(observation_id: str = Query(...), incident_id: str = Query("")):
+    """Manually promote an observation."""
+    success = pipeline.evidence_engine.promote_observation(observation_id, incident_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Observation not found")
+    return {"status": "promoted", "observation_id": observation_id}
 
 
 # ---------------------------------------------------------------------------
@@ -280,7 +482,9 @@ async def export_report(fmt: str):
 @router.post("/clear")
 async def clear_dashboard():
     """Clear all in-memory data and reset the pipeline."""
-    if _watcher and _watcher.is_active:
-        await _watcher.stop()
+    if _monitor and _monitor.is_active:
+        await _monitor.stop_monitoring()
+    if _simulator and _simulator.is_active:
+        await _simulator.stop()
     pipeline.clear()
     return {"status": "cleared"}

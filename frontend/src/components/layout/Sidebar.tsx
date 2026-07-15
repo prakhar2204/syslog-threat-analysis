@@ -1,10 +1,11 @@
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, ScrollText, AlertTriangle, FileDown, Settings } from 'lucide-react';
+import { LayoutDashboard, ScrollText, AlertTriangle, Crosshair, FileDown, Settings } from 'lucide-react';
 
 const NAV = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/logs', icon: ScrollText, label: 'Logs' },
   { to: '/incidents', icon: AlertTriangle, label: 'Incidents' },
+  { to: '/simulator', icon: Crosshair, label: 'Simulator' },
   { to: '/reports', icon: FileDown, label: 'Reports' },
   { to: '/settings', icon: Settings, label: 'Settings' },
 ];

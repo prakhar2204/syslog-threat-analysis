@@ -150,6 +150,144 @@ class Incident(BaseModel):
     triggered_rules: list[str] = Field(default_factory=list)
     mitre_techniques: list[str] = Field(default_factory=list)
     correlation_explanation: str = ""
+    evidence_id: Optional[str] = None  # Link to Evidence object
+
+
+# ---------------------------------------------------------------------------
+# Evidence Intelligence Engine — Matched Conditions
+# ---------------------------------------------------------------------------
+
+class MatchedCondition(BaseModel):
+    """A single condition evaluated during rule matching."""
+
+    condition: str
+    matched: bool
+    value: str = ""
+
+
+# ---------------------------------------------------------------------------
+# Evidence Intelligence Engine — Extracted IOC
+# ---------------------------------------------------------------------------
+
+class ExtractedIOC(BaseModel):
+    """An indicator of compromise extracted from log evidence."""
+
+    ioc_type: str  # ipv4, ipv6, username, hostname, port, service, process, filepath, command, url, email, domain, hash
+    value: str
+    source_event_id: str = ""
+
+
+# ---------------------------------------------------------------------------
+# Evidence Intelligence Engine — Raw Log Reference
+# ---------------------------------------------------------------------------
+
+class RawLogRef(BaseModel):
+    """Reference to a raw log entry with parsed fields preserved."""
+
+    event_id: str
+    raw_log: str
+    timestamp: datetime
+    hostname: str = ""
+    source_ip: Optional[str] = None
+    destination_ip: Optional[str] = None
+    username: Optional[str] = None
+    service: str = ""
+    process: str = ""
+    event_type: str = ""
+    message: str = ""
+    severity: str = ""
+    detection_rule_ids: list[str] = Field(default_factory=list)
+
+
+# ---------------------------------------------------------------------------
+# Evidence Object
+# ---------------------------------------------------------------------------
+
+class Evidence(BaseModel):
+    """Structured evidence collected for a security detection."""
+
+    evidence_id: str = Field(default_factory=lambda: f"EV-{uuid.uuid4().hex[:12]}")
+    incident_id: Optional[str] = None
+    rule_id: str = ""
+    rule_name: str = ""
+    severity: Severity = Severity.INFO
+
+    # Matched conditions — explicit WHY
+    matched_conditions: list[MatchedCondition] = Field(default_factory=list)
+
+    # Context
+    source_ips: list[str] = Field(default_factory=list)
+    destination_ips: list[str] = Field(default_factory=list)
+    hostnames: list[str] = Field(default_factory=list)
+    usernames: list[str] = Field(default_factory=list)
+    processes: list[str] = Field(default_factory=list)
+    services: list[str] = Field(default_factory=list)
+    protocols: list[str] = Field(default_factory=list)
+    ports: list[int] = Field(default_factory=list)
+
+    # Time
+    first_seen: datetime = Field(default_factory=datetime.now)
+    last_seen: datetime = Field(default_factory=datetime.now)
+
+    # References
+    related_event_ids: list[str] = Field(default_factory=list)
+    related_alert_ids: list[str] = Field(default_factory=list)
+    raw_log_refs: list[RawLogRef] = Field(default_factory=list)
+
+    # IOCs
+    extracted_iocs: list[ExtractedIOC] = Field(default_factory=list)
+
+    # Counts
+    event_count: int = 0
+    unique_source_count: int = 0
+    unique_dest_count: int = 0
+
+    # Confidence in evidence completeness (0-100)
+    collection_confidence: float = 0.0
+
+
+# ---------------------------------------------------------------------------
+# Observation — sub-threshold detection
+# ---------------------------------------------------------------------------
+
+class ObservationStatus(str, Enum):
+    OPEN = "OPEN"
+    PROMOTED = "PROMOTED"
+    DISMISSED = "DISMISSED"
+
+
+class Observation(BaseModel):
+    """A low-confidence detection that may promote to an Incident."""
+
+    observation_id: str = Field(default_factory=lambda: f"OBS-{uuid.uuid4().hex[:10]}")
+    status: ObservationStatus = ObservationStatus.OPEN
+    rule_id: str = ""
+    rule_name: str = ""
+    severity: Severity = Severity.INFO
+
+    matched_conditions: list[MatchedCondition] = Field(default_factory=list)
+
+    source_ips: list[str] = Field(default_factory=list)
+    usernames: list[str] = Field(default_factory=list)
+    services: list[str] = Field(default_factory=list)
+    hostnames: list[str] = Field(default_factory=list)
+
+    first_seen: datetime = Field(default_factory=datetime.now)
+    last_seen: datetime = Field(default_factory=datetime.now)
+
+    related_event_ids: list[str] = Field(default_factory=list)
+    related_alert_ids: list[str] = Field(default_factory=list)
+    raw_log_refs: list[RawLogRef] = Field(default_factory=list)
+    extracted_iocs: list[ExtractedIOC] = Field(default_factory=list)
+
+    event_count: int = 0
+    unique_source_count: int = 0
+
+    collection_confidence: float = 0.0
+
+    # Promotion tracking
+    promoted: bool = False
+    promoted_to_incident_id: Optional[str] = None
 
 
 # ---------------------------------------------------------------------------

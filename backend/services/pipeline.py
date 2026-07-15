@@ -15,6 +15,8 @@ from collections import Counter, defaultdict
 from datetime import datetime
 from typing import Optional
 
+from analysis.evidence_engine import EvidenceEngine
+from analysis.evidence_graph import EvidenceGraph, NodeType, EdgeType
 from analysis.incident_builder import IncidentBuilder
 from config import MAX_ALERTS_BUFFER, MAX_INCIDENTS_BUFFER, MAX_LOG_BUFFER
 from correlation.correlation_engine import CorrelationEngine
@@ -22,9 +24,11 @@ from detection.threat_engine import ThreatEngine
 from models.events import (
     Alert,
     DashboardStats,
+    Evidence,
     Incident,
     LogEntry,
     MonitoringStatus,
+    Observation,
     Severity,
 )
 from parser.log_parser import LogParser
@@ -46,6 +50,8 @@ class Pipeline:
         self.threat_engine = ThreatEngine()
         self.correlation_engine = CorrelationEngine()
         self.incident_builder = IncidentBuilder()
+        self.evidence_engine = EvidenceEngine()
+        self.evidence_graph = EvidenceGraph()
 
         # In-memory buffers (bounded)
         self.log_entries: list[LogEntry] = []
@@ -93,6 +99,22 @@ class Pipeline:
                 # Step 4: Enrich with confidence, risk, reasoning
                 self.incident_builder.enrich(incident)
 
+                # Step 4.5: Collect evidence
+                evidence = self.evidence_engine.collect(incident, entry, alerts)
+
+                # Update evidence graph
+                self.evidence_graph.add_event(
+                    entry.event_id, entry.hostname, entry.source_ip,
+                    entry.username, entry.service,
+                )
+                for a in alerts:
+                    self.evidence_graph.add_alert(a.alert_id, entry.event_id, a.rule_id)
+                self.evidence_graph.add_incident(
+                    incident.incident_id,
+                    [a.alert_id for a in alerts],
+                    [entry.event_id],
+                )
+
                 if incident.incident_id not in {i.incident_id for i in self.incidents}:
                     self.incidents.append(incident)
                     new_incidents.append(incident)
@@ -103,6 +125,20 @@ class Pipeline:
                             self.incidents[idx] = incident
                             break
                     new_incidents.append(incident)
+
+            # Step 4.6: Create observations for alerts without incidents
+            if alerts and not incidents:
+                self.evidence_engine.create_observation(entry, alerts)
+                # Graph nodes for non-incident events
+                self.evidence_graph.add_event(
+                    entry.event_id, entry.hostname, entry.source_ip,
+                    entry.username, entry.service,
+                )
+                for a in alerts:
+                    self.evidence_graph.add_alert(a.alert_id, entry.event_id, a.rule_id)
+
+        # Step 4.7: Check observation promotions
+        promoted = self.evidence_engine.check_promotion()
 
         # Enforce buffer limits
         self._enforce_limits()
@@ -121,6 +157,15 @@ class Pipeline:
 
         for incident in new_incidents:
             await ws_manager.broadcast("new_incident", incident)
+
+        # Broadcast evidence and observation events
+        for incident in new_incidents:
+            evidence = self.evidence_engine.get_evidence_by_incident(incident.incident_id)
+            if evidence:
+                await ws_manager.broadcast("evidence_created", evidence)
+
+        for obs in promoted:
+            await ws_manager.broadcast("observation_promoted", obs)
 
         if new_entries:
             stats = self.compute_stats()
@@ -262,6 +307,8 @@ class Pipeline:
         self.incidents.clear()
         self.threat_engine.clear()
         self.correlation_engine.clear()
+        self.evidence_engine.clear()
+        self.evidence_graph.clear()
         self.monitoring = MonitoringStatus()
         logger.info("Pipeline state cleared")
 

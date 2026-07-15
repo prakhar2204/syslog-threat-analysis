@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { api } from '../services/api';
 import { useApp } from '../context/AppContext';
-import type { Incident, Severity } from '../types';
+import type { Incident, Severity, Evidence, RawLogRef } from '../types';
 import { formatTime, formatDateTime } from '../utils/formatters';
-import { ArrowLeft, Clock, Shield, AlertTriangle, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Clock, Shield, AlertTriangle, CheckCircle, XCircle, Search, FileText, ChevronDown, ChevronRight } from 'lucide-react';
 
 function SevBadge({ s }: { s: Severity }) {
   const cls: Record<Severity, string> = {
@@ -63,14 +63,59 @@ export default function Incidents() {
   );
 }
 
+/* ---------- Raw Log Viewer ---------- */
+function RawLogViewer({ logRef }: { logRef: RawLogRef }) {
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <div className="border border-border rounded text-[11px]">
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="w-full flex items-center gap-2 px-2 py-1.5 hover:bg-bg-main transition text-left"
+      >
+        {expanded ? <ChevronDown size={10} /> : <ChevronRight size={10} />}
+        <span className="text-text-secondary font-mono">{formatTime(logRef.timestamp)}</span>
+        <SevBadge s={logRef.severity as Severity} />
+        <span className="text-text-primary truncate flex-1">{logRef.message}</span>
+        {logRef.detection_rule_ids.length > 0 && (
+          <span className="text-[9px] text-primary">{logRef.detection_rule_ids.join(', ')}</span>
+        )}
+      </button>
+      {expanded && (
+        <div className="border-t border-border p-2 space-y-2 bg-bg-main">
+          <div>
+            <div className="text-[9px] text-text-secondary uppercase mb-0.5">Original Log</div>
+            <pre className="text-[10px] font-mono text-text-primary whitespace-pre-wrap bg-white p-2 rounded border border-border">{logRef.raw_log}</pre>
+          </div>
+          <div className="grid grid-cols-3 gap-2 text-[10px]">
+            <div><span className="text-text-secondary">Hostname:</span> <span className="font-mono">{logRef.hostname}</span></div>
+            <div><span className="text-text-secondary">Source IP:</span> <span className="font-mono">{logRef.source_ip || '-'}</span></div>
+            <div><span className="text-text-secondary">Dest IP:</span> <span className="font-mono">{logRef.destination_ip || '-'}</span></div>
+            <div><span className="text-text-secondary">Username:</span> <span className="font-mono">{logRef.username || '-'}</span></div>
+            <div><span className="text-text-secondary">Service:</span> <span className="font-mono">{logRef.service}</span></div>
+            <div><span className="text-text-secondary">Process:</span> <span className="font-mono">{logRef.process}</span></div>
+            <div><span className="text-text-secondary">Event Type:</span> <span>{logRef.event_type}</span></div>
+            <div><span className="text-text-secondary">Severity:</span> <SevBadge s={logRef.severity as Severity} /></div>
+            <div><span className="text-text-secondary">Rules:</span> <span className="text-primary font-mono">{logRef.detection_rule_ids.join(', ') || '-'}</span></div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* ---------- Incident Detail Page ---------- */
 export function IncidentDetail() {
   const { id } = useParams<{ id: string }>();
   const nav = useNavigate();
   const [incident, setIncident] = useState<Incident | null>(null);
+  const [evidence, setEvidence] = useState<Evidence | null>(null);
 
   useEffect(() => {
-    if (id) api.getIncidentDetail(id).then(setIncident).catch(() => {});
+    if (id) {
+      api.getIncidentDetail(id).then(setIncident).catch(() => {});
+      api.getEvidenceByIncident(id).then(setEvidence).catch(() => {});
+    }
   }, [id]);
 
   if (!incident) return <div className="text-xs text-text-secondary p-4">Loading…</div>;
@@ -99,6 +144,81 @@ export function IncidentDetail() {
           <div><span className="text-text-secondary">Last Seen:</span><br />{formatDateTime(incident.last_seen)}</div>
         </div>
       </div>
+
+      {/* ===== EVIDENCE PANEL (FIRST SECTION) ===== */}
+      {evidence && (
+        <div className="bg-bg-card border border-border rounded p-4">
+          <div className="text-xs font-semibold text-text-primary flex items-center gap-2 mb-3">
+            <Search size={14} className="text-primary" /> Evidence
+            <span className="text-[10px] text-text-secondary font-normal ml-auto">
+              {evidence.evidence_id} · {evidence.collection_confidence.toFixed(0)}% confidence
+            </span>
+          </div>
+
+          {/* Evidence Summary */}
+          <div className="grid grid-cols-4 gap-3 mb-3 text-xs">
+            <div><span className="text-text-secondary">Matched Rule:</span><br /><span className="font-medium">{evidence.rule_name}</span></div>
+            <div><span className="text-text-secondary">Primary Source IP:</span><br /><span className="font-mono">{evidence.source_ips[0] || '-'}</span></div>
+            <div><span className="text-text-secondary">Primary Username:</span><br />{evidence.usernames[0] || '-'}</div>
+            <div><span className="text-text-secondary">Affected Service:</span><br />{evidence.services[0] || '-'}</div>
+            <div><span className="text-text-secondary">Time Window:</span><br />{formatTime(evidence.first_seen)} - {formatTime(evidence.last_seen)}</div>
+            <div><span className="text-text-secondary">Evidence Count:</span><br />{evidence.event_count} events</div>
+            <div><span className="text-text-secondary">Raw Log Count:</span><br />{evidence.raw_log_refs.length}</div>
+            <div><span className="text-text-secondary">Related Alerts:</span><br />{evidence.related_alert_ids.length}</div>
+          </div>
+
+          {/* Matched Conditions */}
+          {evidence.matched_conditions.length > 0 && (
+            <div className="mb-3">
+              <div className="text-[10px] font-semibold text-text-secondary uppercase tracking-wider mb-1.5">Matched Conditions</div>
+              <div className="grid grid-cols-2 gap-1">
+                {evidence.matched_conditions.map((cond, i) => (
+                  <div key={i} className="flex items-center gap-2 text-xs">
+                    {cond.matched ? (
+                      <CheckCircle size={12} className="text-severity-info shrink-0" />
+                    ) : (
+                      <XCircle size={12} className="text-severity-critical shrink-0" />
+                    )}
+                    <span className="text-text-primary">{cond.condition}</span>
+                    {cond.value && <span className="text-text-secondary font-mono text-[10px]">{cond.value}</span>}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Extracted IOCs */}
+          {evidence.extracted_iocs.length > 0 && (
+            <div className="mb-3">
+              <div className="text-[10px] font-semibold text-text-secondary uppercase tracking-wider mb-1.5">Extracted IOCs</div>
+              <div className="flex flex-wrap gap-1">
+                {evidence.extracted_iocs.slice(0, 20).map((ioc, i) => (
+                  <span key={i} className="text-[10px] px-1.5 py-0.5 rounded bg-bg-main border border-border font-mono">
+                    <span className="text-text-secondary">{ioc.ioc_type}:</span> {ioc.value}
+                  </span>
+                ))}
+                {evidence.extracted_iocs.length > 20 && (
+                  <span className="text-[10px] text-text-secondary">+{evidence.extracted_iocs.length - 20} more</span>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Raw Log Viewer */}
+          {evidence.raw_log_refs.length > 0 && (
+            <div>
+              <div className="text-[10px] font-semibold text-text-secondary uppercase tracking-wider mb-1.5 flex items-center gap-1">
+                <FileText size={10} /> Raw Logs ({evidence.raw_log_refs.length})
+              </div>
+              <div className="space-y-1 max-h-64 overflow-y-auto">
+                {evidence.raw_log_refs.map(ref => (
+                  <RawLogViewer key={ref.event_id} logRef={ref} />
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Reasoning */}
       <div className="bg-bg-card border border-border rounded p-4">
