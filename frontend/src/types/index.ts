@@ -84,13 +84,22 @@ export interface DashboardStats {
   threat_trend: { time: string; count: number }[];
 }
 
+export interface WatchedFileStatus {
+  path: string;
+  filename: string;
+  offset: number;
+  lines_processed: number;
+  last_size: number;
+  active: boolean;
+}
+
 export interface MonitoringStatus {
   active: boolean;
   paused: boolean;
   mode: string | null;
   folder: string | null;
-  current_file: string | null;
   files_monitored: number;
+  active_files: WatchedFileStatus[];
   lines_processed: number;
   watcher_uptime_seconds: number;
   events_per_second: number;

@@ -4,13 +4,15 @@ SysLog Threat Analysis - Monitoring Intelligence Layer
 Central abstraction for all log sources. Manages monitoring sessions,
 folder watching, and provides the unified monitoring status used by
 the dashboard and API.
+
+Redesigned for true multi-file monitoring: every log file in a
+monitored folder is watched simultaneously, new files are detected
+automatically, and all events flow through the shared pipeline.
 """
 
 from __future__ import annotations
 
-import asyncio
 import logging
-import os
 import time
 import uuid
 from datetime import datetime
@@ -124,8 +126,9 @@ class MonitorManager:
     """
     Orchestrates monitoring across all source types.
 
-    Manages the LogWatcher, tracks sessions, and provides the unified
-    monitoring status that the dashboard and API consume.
+    Uses the multi-file LogWatcher to monitor every log file in a folder
+    simultaneously. Tracks sessions and provides unified monitoring
+    status for the dashboard and API.
     """
 
     def __init__(self) -> None:
@@ -133,9 +136,8 @@ class MonitorManager:
         self._current_session: Optional[MonitoringSession] = None
         self._session_history: list[MonitoringSession] = []
         self._paused: bool = False
-        self._pause_file: str = ""
+        self._pause_folder: Optional[str] = None
         self._startup_time: float = 0.0
-        self._files_monitored: int = 0
 
     # -- Properties --
 
@@ -154,15 +156,10 @@ class MonitorManager:
     # -- Session lifecycle --
 
     async def start_folder_monitoring(self, folder: Optional[str] = None) -> dict:
-        """Start monitoring all log files in a folder."""
+        """Start monitoring ALL log files in a folder."""
         folder_path = Path(folder) if folder else SAMPLE_LOGS_DIR
         if not folder_path.exists():
             folder_path.mkdir(parents=True, exist_ok=True)
-
-        # Find first log file in folder
-        log_file = self._find_log_file(folder_path)
-        if not log_file:
-            return {"status": "no_files", "message": f"No log files found in {folder_path}"}
 
         if self.watcher.is_active:
             await self.stop_monitoring()
@@ -173,21 +170,30 @@ class MonitorManager:
             source_path=str(folder_path),
         )
         self._current_session = session
-        self._files_monitored = len(self._list_log_files(folder_path))
 
-        # Start watcher on the file
-        await self.watcher.start(
-            str(log_file),
+        # Start multi-file watcher — monitors ALL files, not just the first
+        discovered = await self.watcher.start_folder(
+            str(folder_path),
             on_new_lines=pipeline.process_lines,
             from_beginning=True,
         )
+
         pipeline.monitoring.active = True
-        pipeline.monitoring.file_path = str(log_file)
+        pipeline.monitoring.file_path = str(folder_path)
         self._startup_time = time.time()
         self._paused = False
 
-        logger.info("Folder monitoring started: %s (%d files)", folder_path, self._files_monitored)
-        return {"status": "started", "folder": str(folder_path), "file": str(log_file)}
+        file_names = [Path(f).name for f in discovered]
+        logger.info(
+            "Folder monitoring started: %s (%d files: %s)",
+            folder_path, len(discovered), ", ".join(file_names),
+        )
+        return {
+            "status": "started",
+            "folder": str(folder_path),
+            "files": file_names,
+            "file_count": len(discovered),
+        }
 
     async def start_file_monitoring(self, file_path: str, from_beginning: bool = True) -> dict:
         """Start monitoring a specific file."""
@@ -204,7 +210,7 @@ class MonitorManager:
         )
         self._current_session = session
 
-        await self.watcher.start(
+        await self.watcher.start_single(
             file_path,
             on_new_lines=pipeline.process_lines,
             from_beginning=from_beginning,
@@ -213,14 +219,13 @@ class MonitorManager:
         pipeline.monitoring.file_path = file_path
         self._startup_time = time.time()
         self._paused = False
-        self._files_monitored = 1
 
         logger.info("File monitoring started: %s", file_path)
         return {"status": "started", "file": file_path}
 
     async def stop_monitoring(self) -> dict:
         """Stop current monitoring and close the session."""
-        lines = self.watcher.lines_processed
+        lines = self.watcher.total_lines_processed
         if self.watcher.is_active:
             await self.watcher.stop()
         pipeline.monitoring.active = False
@@ -231,14 +236,15 @@ class MonitorManager:
             self._session_history.append(self._current_session)
             self._current_session = None
 
-        logger.info("Monitoring stopped: %d lines processed", lines)
+        logger.info("Monitoring stopped: %d total lines processed", lines)
         return {"status": "stopped", "lines_processed": lines}
 
     async def pause_monitoring(self) -> dict:
         """Pause monitoring without ending the session."""
         if not self.watcher.is_active:
             return {"status": "not_active"}
-        self._pause_file = self.watcher.file_path
+        # Remember the folder for resume
+        self._pause_folder = self.watcher._folder
         await self.watcher.stop()
         self._paused = True
         if self._current_session:
@@ -248,19 +254,22 @@ class MonitorManager:
 
     async def resume_monitoring(self) -> dict:
         """Resume a paused monitoring session."""
-        if not self._paused or not self._pause_file:
+        if not self._paused:
             return {"status": "not_paused"}
-        await self.watcher.start(
-            self._pause_file,
-            on_new_lines=pipeline.process_lines,
-            from_beginning=False,  # Resume from where we left off
-        )
+
+        if self._pause_folder:
+            # Resume folder monitoring — continues from current offsets
+            await self.watcher.start_folder(
+                self._pause_folder,
+                on_new_lines=pipeline.process_lines,
+                from_beginning=False,  # Resume from where we left off
+            )
         pipeline.monitoring.active = True
         self._paused = False
         if self._current_session:
             self._current_session.status = SessionStatus.ACTIVE
-        logger.info("Monitoring resumed: %s", self._pause_file)
-        return {"status": "resumed", "file": self._pause_file}
+        logger.info("Monitoring resumed: %s", self._pause_folder)
+        return {"status": "resumed"}
 
     # -- Status --
 
@@ -269,14 +278,19 @@ class MonitorManager:
         session = self._current_session
         uptime = round(time.time() - self._startup_time, 1) if self._startup_time else 0
 
+        # Build per-file status
+        active_files = [
+            wf.to_dict() for wf in self.watcher.watched_files if wf.active
+        ]
+
         return {
             "active": self.watcher.is_active,
             "paused": self._paused,
             "mode": session.source_type.value if session else None,
             "folder": session.source_path if session else None,
-            "current_file": self.watcher.file_path if self.watcher.is_active else None,
-            "files_monitored": self._files_monitored,
-            "lines_processed": self.watcher.lines_processed,
+            "files_monitored": self.watcher.active_file_count,
+            "active_files": active_files,
+            "lines_processed": self.watcher.total_lines_processed,
             "watcher_uptime_seconds": uptime,
             "events_per_second": session.events_per_second if session else 0,
             "last_event_time": (
@@ -309,33 +323,16 @@ class MonitorManager:
 
     async def auto_start(self) -> None:
         """Auto-start folder monitoring if log files exist in sample_logs/."""
-        log_file = self._find_log_file(SAMPLE_LOGS_DIR)
-        if log_file:
-            await self.start_folder_monitoring()
-            logger.info("Auto-started monitoring: %s", SAMPLE_LOGS_DIR)
+        if SAMPLE_LOGS_DIR.exists():
+            from services.log_watcher import is_log_file
+            has_files = any(is_log_file(f) for f in SAMPLE_LOGS_DIR.iterdir())
+            if has_files:
+                await self.start_folder_monitoring()
+                logger.info("Auto-started monitoring: %s", SAMPLE_LOGS_DIR)
+            else:
+                logger.info("No log files found for auto-start in %s", SAMPLE_LOGS_DIR)
         else:
-            logger.info("No log files found for auto-start in %s", SAMPLE_LOGS_DIR)
-
-    # -- Helpers --
-
-    def _find_log_file(self, folder: Path) -> Optional[Path]:
-        """Find the first suitable log file in a folder."""
-        for f in self._list_log_files(folder):
-            return f
-        return None
-
-    def _list_log_files(self, folder: Path) -> list[Path]:
-        """List all log files in a folder."""
-        if not folder.exists():
-            return []
-        log_names = {"syslog", "auth.log", "kern.log", "messages"}
-        files = []
-        for entry in folder.iterdir():
-            if entry.is_file() and (
-                entry.suffix == ".log" or entry.name in log_names
-            ):
-                files.append(entry)
-        return sorted(files, key=lambda f: f.name)
+            logger.info("Sample logs directory does not exist: %s", SAMPLE_LOGS_DIR)
 
 
 # Global instance

@@ -1,6 +1,6 @@
 /* SysLog Threat Analysis - Monitoring Status Widget */
 
-import { Activity, Clock, Database, Wifi, Server, FolderOpen, Pause, Play, Square } from 'lucide-react';
+import { Activity, Clock, Database, Wifi, Server, FolderOpen, Pause, Play, Square, FileText } from 'lucide-react';
 import type { MonitoringStatus as MonStatus } from '../../types';
 import { api } from '../../services/api';
 
@@ -53,6 +53,24 @@ export default function MonitoringStatusWidget({ status, onRefresh }: Props) {
         <Row icon={<Clock size={10} />} label="Uptime" value={formatUptime(status.watcher_uptime_seconds)} />
         <Row icon={<Wifi size={10} />} label="Lines" value={status.lines_processed.toLocaleString()} />
       </div>
+
+      {/* Per-file monitoring list */}
+      {status.active_files && status.active_files.length > 0 && (
+        <div className="mt-2 pt-2 border-t border-border">
+          <div className="text-[9px] font-semibold text-text-secondary uppercase tracking-wider mb-1">
+            Currently Monitoring
+          </div>
+          <div className="space-y-0.5">
+            {status.active_files.map(f => (
+              <div key={f.path} className="flex items-center gap-1.5 text-[10px]">
+                <FileText size={9} className="text-primary shrink-0" />
+                <span className="text-text-primary font-mono truncate flex-1">{f.filename}</span>
+                <span className="text-text-secondary">{f.lines_processed.toLocaleString()} lines</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
