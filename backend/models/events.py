@@ -152,6 +152,28 @@ class Incident(BaseModel):
     correlation_explanation: str = ""
     evidence_id: Optional[str] = None  # Link to Evidence object
 
+    # --- Phase 5.4: Advanced Intelligence Fields ---
+    attack_chain_id: Optional[str] = None
+    attack_chain_stage: str = ""
+    attack_chain_progress: float = 0.0
+    attack_chain_stages_completed: list[str] = Field(default_factory=list)
+    attack_chain_stages_missing: list[str] = Field(default_factory=list)
+    estimated_objective: str = ""
+    threat_score: float = 0.0
+    threat_score_breakdown: dict = Field(default_factory=dict)
+    priority: int = 0
+    behavioural_findings: list[str] = Field(default_factory=list)
+    root_cause: str = ""
+    smart_recommendations: list[dict] = Field(default_factory=list)
+    executive_summary: str = ""
+    technical_summary: str = ""
+    attack_narrative: str = ""
+    affected_assets: list[str] = Field(default_factory=list)
+    mitre_summary: str = ""
+    merged_incident_ids: list[str] = Field(default_factory=list)
+    is_merged: bool = False
+
+
 
 # ---------------------------------------------------------------------------
 # Evidence Intelligence Engine — Matched Conditions

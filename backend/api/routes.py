@@ -488,3 +488,178 @@ async def clear_dashboard():
         await _simulator.stop()
     pipeline.clear()
     return {"status": "cleared"}
+
+
+# ---------------------------------------------------------------------------
+# Phase 5.4: Attack Chain Intelligence
+# ---------------------------------------------------------------------------
+
+@router.get("/attack-chains")
+async def get_attack_chains():
+    """Get all active attack chains with stage progression."""
+    chains = pipeline.incident_builder.chain_detector.get_chains()
+    return {"chains": chains, "total": len(chains)}
+
+
+# ---------------------------------------------------------------------------
+# Phase 5.4: IOC Relationship Intelligence
+# ---------------------------------------------------------------------------
+
+@router.get("/ioc-relationships")
+async def get_ioc_relationships(limit: int = Query(default=20, le=100)):
+    """Get top IOCs ranked by confidence with relationships."""
+    iocs = pipeline.ioc_engine.get_top_iocs(limit)
+    return {"iocs": iocs, "total": len(iocs)}
+
+
+@router.get("/ioc-relationships/{ioc_type}/{value}")
+async def get_ioc_detail(ioc_type: str, value: str):
+    """Get detailed IOC information with all relationships."""
+    ioc = pipeline.ioc_engine.get_ioc(ioc_type, value)
+    if not ioc:
+        raise HTTPException(status_code=404, detail="IOC not found")
+    related = pipeline.ioc_engine.get_related_iocs(ioc_type, value)
+    return {"ioc": ioc, "related": related}
+
+
+@router.get("/ioc-relationships/incident/{incident_id}")
+async def get_iocs_for_incident(incident_id: str):
+    """Get all IOCs related to a specific incident."""
+    iocs = pipeline.ioc_engine.get_iocs_for_incident(incident_id)
+    return {"iocs": iocs, "total": len(iocs)}
+
+
+# ---------------------------------------------------------------------------
+# Phase 5.4: Dashboard Intelligence
+# ---------------------------------------------------------------------------
+
+@router.get("/dashboard-intelligence")
+async def get_dashboard_intelligence():
+    """
+    SOC-focused dashboard intelligence replacing generic statistics.
+    Returns: most dangerous attack, most active attacker, most targeted user,
+    most targeted service, top IOCs, attack chain progress, SOC queue.
+    """
+    incidents = [i for i in pipeline.incidents if not i.is_merged]
+    alerts = pipeline.alerts
+
+    # Most dangerous attack (highest threat score)
+    most_dangerous = None
+    if incidents:
+        top = max(incidents, key=lambda i: i.threat_score)
+        most_dangerous = {
+            "incident_id": top.incident_id,
+            "type": top.incident_type,
+            "threat_score": top.threat_score,
+            "severity": top.severity.value,
+            "confidence": top.confidence,
+        }
+
+    # Most active attacker
+    from collections import Counter
+    ip_counts = Counter()
+    for inc in incidents:
+        for ip in inc.source_ips:
+            ip_counts[ip] += inc.total_events
+    most_active_attacker = None
+    if ip_counts:
+        ip, count = ip_counts.most_common(1)[0]
+        most_active_attacker = {"ip": ip, "event_count": count}
+
+    # Most targeted user
+    user_counts = Counter()
+    for inc in incidents:
+        if inc.target_user:
+            user_counts[inc.target_user] += inc.total_events
+    most_targeted_user = None
+    if user_counts:
+        user, count = user_counts.most_common(1)[0]
+        most_targeted_user = {"user": user, "event_count": count}
+
+    # Most targeted service
+    service_counts = Counter()
+    for alert in alerts:
+        rule_id = alert.rule_id
+        if rule_id in ("R001", "R002", "R003", "R004", "R014"):
+            service_counts["sshd"] += 1
+        elif rule_id in ("R006", "R007", "R008", "R015"):
+            service_counts["web"] += 1
+        elif rule_id == "R005":
+            service_counts["sudo"] += 1
+        elif rule_id == "R010":
+            service_counts["firewall"] += 1
+    most_targeted_service = None
+    if service_counts:
+        svc, count = service_counts.most_common(1)[0]
+        most_targeted_service = {"service": svc, "event_count": count}
+
+    # Top IOCs
+    top_iocs = pipeline.ioc_engine.get_top_iocs(5)
+
+    # Attack chains
+    chains = pipeline.incident_builder.chain_detector.get_chains()
+
+    # SOC queue (priority-ordered incidents)
+    soc_queue = [
+        {
+            "incident_id": i.incident_id,
+            "type": i.incident_type,
+            "severity": i.severity.value,
+            "threat_score": i.threat_score,
+            "priority": i.priority,
+            "confidence": i.confidence,
+        }
+        for i in sorted(incidents, key=lambda x: x.priority)[:10]
+    ]
+
+    # Behavioural findings
+    behaviour_findings = pipeline.incident_builder.behaviour_analyzer.get_global_findings()
+
+    return {
+        "most_dangerous_attack": most_dangerous,
+        "most_active_attacker": most_active_attacker,
+        "most_targeted_user": most_targeted_user,
+        "most_targeted_service": most_targeted_service,
+        "top_iocs": top_iocs,
+        "attack_chains": chains,
+        "soc_queue": soc_queue,
+        "behaviour_findings": behaviour_findings,
+        "total_incidents": len(incidents),
+        "merged_incidents": len([i for i in pipeline.incidents if i.is_merged]),
+    }
+
+
+# ---------------------------------------------------------------------------
+# Phase 5.4: Investigation Insights
+# ---------------------------------------------------------------------------
+
+@router.get("/incidents/{incident_id}/insights")
+async def get_incident_insights(incident_id: str):
+    """Get full investigation insights for a single incident."""
+    incident = pipeline.correlation_engine.get_incident(incident_id)
+    if not incident:
+        raise HTTPException(status_code=404, detail="Incident not found")
+
+    return {
+        "incident_id": incident.incident_id,
+        "executive_summary": incident.executive_summary,
+        "technical_summary": incident.technical_summary,
+        "attack_narrative": incident.attack_narrative,
+        "root_cause": incident.root_cause,
+        "affected_assets": incident.affected_assets,
+        "mitre_summary": incident.mitre_summary,
+        "behavioural_findings": incident.behavioural_findings,
+        "smart_recommendations": incident.smart_recommendations,
+        "attack_chain": {
+            "chain_id": incident.attack_chain_id,
+            "stage": incident.attack_chain_stage,
+            "progress": incident.attack_chain_progress,
+            "stages_completed": incident.attack_chain_stages_completed,
+            "stages_missing": incident.attack_chain_stages_missing,
+            "estimated_objective": incident.estimated_objective,
+        },
+        "threat_score": incident.threat_score,
+        "threat_score_breakdown": incident.threat_score_breakdown,
+        "priority": incident.priority,
+    }
+

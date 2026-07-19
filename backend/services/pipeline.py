@@ -18,6 +18,9 @@ from typing import Optional
 from analysis.evidence_engine import EvidenceEngine
 from analysis.evidence_graph import EvidenceGraph, NodeType, EdgeType
 from analysis.incident_builder import IncidentBuilder
+from analysis.incident_merger import IncidentMerger
+from analysis.ioc_relationship import IOCRelationshipEngine
+from analysis.threat_scorer import calculate_priority
 from config import MAX_ALERTS_BUFFER, MAX_INCIDENTS_BUFFER, MAX_LOG_BUFFER
 from correlation.correlation_engine import CorrelationEngine
 from detection.threat_engine import ThreatEngine
@@ -52,6 +55,8 @@ class Pipeline:
         self.incident_builder = IncidentBuilder()
         self.evidence_engine = EvidenceEngine()
         self.evidence_graph = EvidenceGraph()
+        self.incident_merger = IncidentMerger()
+        self.ioc_engine = IOCRelationshipEngine()
 
         # In-memory buffers (bounded)
         self.log_entries: list[LogEntry] = []
@@ -93,6 +98,10 @@ class Pipeline:
                 new_alerts.append(alert)
                 self.alerts.append(alert)
 
+            # Step 2.5: Track behaviour + IOC relationships
+            self.incident_builder.behaviour_analyzer.track_event(entry, alerts)
+            self.ioc_engine.track_event(entry, alerts)
+
             # Step 3: Correlation
             incidents = self.correlation_engine.feed(entry, alerts)
             for incident in incidents:
@@ -115,9 +124,14 @@ class Pipeline:
                     [entry.event_id],
                 )
 
+                # Track IOC relationships for this incident
+                self.ioc_engine.track_event(entry, alerts, incident.incident_id)
+
                 if incident.incident_id not in {i.incident_id for i in self.incidents}:
-                    self.incidents.append(incident)
-                    new_incidents.append(incident)
+                    # False positive check before adding
+                    if self.incident_merger.reduce_false_positives(incident):
+                        self.incidents.append(incident)
+                        new_incidents.append(incident)
                 else:
                     # Update existing — re-enrich
                     for idx, existing in enumerate(self.incidents):
@@ -139,6 +153,14 @@ class Pipeline:
 
         # Step 4.7: Check observation promotions
         promoted = self.evidence_engine.check_promotion()
+
+        # Step 4.8: Merge duplicate incidents
+        if new_incidents:
+            self.incident_merger.merge_candidates(self.incidents)
+
+        # Step 4.9: Calculate SOC queue priority
+        active_incidents = [i for i in self.incidents if not i.is_merged]
+        calculate_priority(active_incidents)
 
         # Enforce buffer limits
         self._enforce_limits()
@@ -309,6 +331,8 @@ class Pipeline:
         self.correlation_engine.clear()
         self.evidence_engine.clear()
         self.evidence_graph.clear()
+        self.incident_builder.clear()
+        self.ioc_engine.clear()
         self.monitoring = MonitoringStatus()
         logger.info("Pipeline state cleared")
 
