@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { api } from '../services/api';
 import PipelineVisualizer from '../components/monitoring/PipelineVisualizer';
+import SimulationSummary from '../components/simulation/SimulationSummary';
 import type { SimScenario, SimulationStatus, PipelineStats } from '../types';
 import { Play, Square, RotateCcw, Zap, Circle } from 'lucide-react';
 
@@ -75,6 +76,9 @@ export default function Simulator() {
       {/* Pipeline */}
       <PipelineVisualizer stats={pipeline} />
 
+      {/* Simulation Summary — shown after completion */}
+      {status && <SimulationSummary status={status} pipeline={pipeline} />}
+
       <div className="grid grid-cols-3 gap-3">
         {/* Scenario Selection */}
         <div className="col-span-2 bg-bg-card border border-border rounded p-3">
@@ -137,7 +141,7 @@ export default function Simulator() {
                   type="text"
                   value={targetUser}
                   onChange={e => setTargetUser(e.target.value)}
-                  className="w-full text-xs border border-border rounded px-2 py-1 bg-white"
+                  className="w-full text-xs border border-border rounded px-2 py-1 bg-bg-card text-text-primary"
                 />
               </div>
               <div className="text-[10px] text-text-secondary">
@@ -162,11 +166,11 @@ export default function Simulator() {
                 </button>
               )}
               <button onClick={handleGenerate} disabled={selected.size === 0}
-                className="flex items-center justify-center gap-1 text-[11px] bg-bg-main text-text-primary border border-border px-2 py-1.5 rounded hover:bg-gray-100 transition disabled:opacity-40">
+                className="flex items-center justify-center gap-1 text-[11px] bg-bg-main text-text-primary border border-border px-2 py-1.5 rounded hover:bg-border transition disabled:opacity-40">
                 <Zap size={11} /> Generate
               </button>
               <button onClick={handleReset}
-                className="col-span-2 flex items-center justify-center gap-1 text-[11px] text-text-secondary border border-border px-2 py-1.5 rounded hover:bg-gray-50 transition">
+                className="col-span-2 flex items-center justify-center gap-1 text-[11px] text-text-secondary border border-border px-2 py-1.5 rounded hover:bg-bg-main transition">
                 <RotateCcw size={11} /> Reset
               </button>
             </div>

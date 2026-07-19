@@ -21,7 +21,7 @@ export default function SettingsPage() {
           <input
             type="text"
             defaultValue="sample_logs/"
-            className="text-xs border border-border rounded px-2 py-1.5 bg-white w-full"
+            className="text-xs border border-border rounded px-2 py-1.5 bg-bg-card text-text-primary w-full"
             readOnly
           />
           <span className="text-[10px] text-text-secondary">Configured in backend config.py</span>
@@ -32,7 +32,7 @@ export default function SettingsPage() {
           <input
             type="text"
             defaultValue="100,000 entries"
-            className="text-xs border border-border rounded px-2 py-1.5 bg-white w-full"
+            className="text-xs border border-border rounded px-2 py-1.5 bg-bg-card text-text-primary w-full"
             readOnly
           />
           <span className="text-[10px] text-text-secondary">Older entries are automatically trimmed</span>
@@ -43,7 +43,7 @@ export default function SettingsPage() {
           <input
             type="text"
             defaultValue="200ms"
-            className="text-xs border border-border rounded px-2 py-1.5 bg-white w-full"
+            className="text-xs border border-border rounded px-2 py-1.5 bg-bg-card text-text-primary w-full"
             readOnly
           />
         </div>

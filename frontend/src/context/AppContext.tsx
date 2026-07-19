@@ -3,6 +3,7 @@
 import { createContext, useContext, useCallback, useEffect, useReducer, useRef, type ReactNode } from 'react';
 import type { Alert, DashboardStats, Incident, LogEntry, WSMessage } from '../types';
 import { useWebSocket } from '../hooks/useWebSocket';
+import { useNotifications } from './NotificationContext';
 
 interface AppState {
   logs: LogEntry[];
@@ -10,6 +11,7 @@ interface AppState {
   incidents: Incident[];
   stats: DashboardStats | null;
   wsConnected: boolean;
+  latestCriticalIncident: Incident | null;
 }
 
 type Action =
@@ -39,14 +41,18 @@ function reducer(state: AppState, action: Action): AppState {
       } else {
         incidents = [action.payload, ...state.incidents];
       }
-      return { ...state, incidents };
+      // Track latest critical incident for banner
+      const latestCritical = (action.payload.severity === 'CRITICAL' && action.payload.status === 'ACTIVE')
+        ? action.payload
+        : state.latestCriticalIncident;
+      return { ...state, incidents, latestCriticalIncident: latestCritical };
     }
     case 'SET_STATS':
       return { ...state, stats: action.payload };
     case 'SET_WS':
       return { ...state, wsConnected: action.payload };
     case 'CLEAR':
-      return { ...state, logs: [], alerts: [], incidents: [], stats: null };
+      return { ...state, logs: [], alerts: [], incidents: [], stats: null, latestCriticalIncident: null };
     default:
       return state;
   }
@@ -58,6 +64,7 @@ const initial: AppState = {
   incidents: [],
   stats: null,
   wsConnected: false,
+  latestCriticalIncident: null,
 };
 
 const AppContext = createContext<{
@@ -67,20 +74,45 @@ const AppContext = createContext<{
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(reducer, initial);
+  const { push } = useNotifications();
+  const pushRef = useRef(push);
+  pushRef.current = push;
 
   const handleWS = useCallback((msg: WSMessage) => {
     switch (msg.type) {
       case 'new_logs':
         dispatch({ type: 'ADD_LOGS', payload: msg.data as LogEntry[] });
         break;
-      case 'new_alert':
-        dispatch({ type: 'ADD_ALERT', payload: msg.data as Alert });
+      case 'new_alert': {
+        const alert = msg.data as Alert;
+        dispatch({ type: 'ADD_ALERT', payload: alert });
+        if (alert.severity === 'CRITICAL' || alert.severity === 'HIGH') {
+          pushRef.current(
+            alert.severity === 'CRITICAL' ? 'critical' : 'warning',
+            `${alert.severity} Alert`,
+            `${alert.rule_name} — ${alert.source_ip || 'unknown'}`
+          );
+        }
         break;
-      case 'new_incident':
-        dispatch({ type: 'ADD_INCIDENT', payload: msg.data as Incident });
+      }
+      case 'new_incident': {
+        const inc = msg.data as Incident;
+        dispatch({ type: 'ADD_INCIDENT', payload: inc });
+        pushRef.current(
+          inc.severity === 'CRITICAL' ? 'critical' : 'warning',
+          `Incident: ${inc.incident_type}`,
+          `${inc.confidence}% confidence · ${inc.source_ips[0] || '—'} → ${inc.target_user || '—'}`
+        );
         break;
+      }
       case 'stats_update':
         dispatch({ type: 'SET_STATS', payload: msg.data as DashboardStats });
+        break;
+      case 'evidence_created':
+        pushRef.current('info', 'Evidence Created', 'New evidence collected for investigation');
+        break;
+      case 'observation_promoted':
+        pushRef.current('success', 'Observation Promoted', 'Sub-threshold detection promoted to incident');
         break;
     }
   }, []);

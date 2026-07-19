@@ -71,14 +71,14 @@ export default function Logs() {
             placeholder="Search logs (IP, keyword, username, rule ID, MITRE)…"
             value={search}
             onChange={e => { setSearch(e.target.value); setPage(0); }}
-            className="w-full text-xs border border-border rounded pl-7 pr-2 py-1.5 bg-white"
+            className="w-full text-xs border border-border rounded pl-7 pr-2 py-1.5 bg-bg-card"
           />
         </div>
-        <select value={severity} onChange={e => { setSeverity(e.target.value); setPage(0); }} className="text-xs border border-border rounded px-2 py-1.5 bg-white">
+        <select value={severity} onChange={e => { setSeverity(e.target.value); setPage(0); }} className="text-xs border border-border rounded px-2 py-1.5 bg-bg-card">
           <option value="">All Severities</option>
           {SEVERITIES.map(s => <option key={s} value={s}>{s}</option>)}
         </select>
-        <select value={eventType} onChange={e => { setEventType(e.target.value); setPage(0); }} className="text-xs border border-border rounded px-2 py-1.5 bg-white">
+        <select value={eventType} onChange={e => { setEventType(e.target.value); setPage(0); }} className="text-xs border border-border rounded px-2 py-1.5 bg-bg-card">
           <option value="">All Event Types</option>
           {EVENT_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
         </select>
@@ -87,7 +87,7 @@ export default function Logs() {
           placeholder="Source IP"
           value={sourceIp}
           onChange={e => { setSourceIp(e.target.value); setPage(0); }}
-          className="text-xs border border-border rounded px-2 py-1.5 bg-white w-32"
+          className="text-xs border border-border rounded px-2 py-1.5 bg-bg-card w-32"
         />
         <span className="text-[10px] text-text-secondary">{total.toLocaleString()} results</span>
       </div>
@@ -129,7 +129,7 @@ export default function Logs() {
                       <div className="space-y-2 text-xs">
                         <div>
                           <span className="font-medium text-text-secondary">Raw Log:</span>
-                          <pre className="mt-1 bg-white border border-border rounded p-2 text-[11px] font-mono overflow-x-auto whitespace-pre-wrap">{detail.entry.raw_log}</pre>
+                          <pre className="mt-1 bg-bg-card border border-border rounded p-2 text-[11px] font-mono overflow-x-auto whitespace-pre-wrap">{detail.entry.raw_log}</pre>
                         </div>
                         <div className="grid grid-cols-4 gap-2">
                           <div><span className="text-text-secondary">Hostname:</span> {detail.entry.hostname || '—'}</div>
@@ -142,7 +142,7 @@ export default function Logs() {
                             <span className="font-medium text-text-secondary">Detection Rules Triggered:</span>
                             <div className="mt-1 space-y-1">
                               {detail.triggered_rules.map(rule => (
-                                <div key={rule.rule_id} className="bg-white border border-border rounded p-2">
+                                <div key={rule.rule_id} className="bg-bg-card border border-border rounded p-2">
                                   <div className="font-medium">[{rule.rule_id}] {rule.name} <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${badgeCls(rule.severity)}`}>{rule.severity}</span></div>
                                   <div className="text-text-secondary mt-0.5">{rule.description}</div>
                                   {rule.mitre && <div className="text-primary mt-0.5">MITRE ATT&CK: {rule.mitre}</div>}

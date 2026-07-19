@@ -3,7 +3,8 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useApp } from '../context/AppContext';
 import { api } from '../services/api';
-import StatsCards from '../components/dashboard/StatsCards';
+import ActiveThreatCenter from '../components/dashboard/ActiveThreatCenter';
+import ThreatSummary from '../components/dashboard/ThreatSummary';
 import LogStream from '../components/dashboard/LogStream';
 import InvestigationPanel from '../components/dashboard/InvestigationPanel';
 import DashboardCharts from '../components/charts/DashboardCharts';
@@ -52,10 +53,16 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-3">
-      {/* Monitoring Sources */}
+      {/* 1. Active Threat Center — highest priority */}
+      <ActiveThreatCenter incidents={state.incidents} />
+
+      {/* 2. Threat Summary metrics */}
+      <ThreatSummary />
+
+      {/* 3. Monitoring Sources */}
       <MonitoringSources monitor={monitorStatus} simulation={simStatus} />
 
-      {/* Monitoring Status + Pipeline */}
+      {/* 4. Pipeline + Monitoring Status */}
       <div className="grid grid-cols-3 gap-3">
         <div className="col-span-2">
           <PipelineVisualizer stats={pipelineStats} />
@@ -65,10 +72,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Stats Cards */}
-      <StatsCards stats={state.stats} />
-
-      {/* Main Content */}
+      {/* 5. Incidents + Log Stream */}
       <div className="grid grid-cols-3 gap-3">
         <div className="col-span-2">
           <LogStream logs={state.logs} />
@@ -78,7 +82,10 @@ export default function Dashboard() {
         </div>
       </div>
 
+      {/* 6. Investigations */}
       <InvestigationPanel />
+
+      {/* 7. Charts */}
       <DashboardCharts stats={state.stats} />
     </div>
   );

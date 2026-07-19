@@ -1,8 +1,9 @@
 /* SysLog Threat Analysis - Monitoring Status Widget */
 
-import { Activity, Clock, Database, Wifi, Server, FolderOpen, Pause, Play, Square, FileText } from 'lucide-react';
+import { Activity, Clock, Database, Wifi, Server, FolderOpen, Pause, Play, Square, FileText, Circle } from 'lucide-react';
 import type { MonitoringStatus as MonStatus } from '../../types';
 import { api } from '../../services/api';
+import { formatBytes } from '../../utils/formatters';
 
 interface Props {
   status: MonStatus | null;
@@ -27,19 +28,19 @@ export default function MonitoringStatusWidget({ status, onRefresh }: Props) {
         <div className="flex items-center gap-1.5">
           {status.active ? (
             <>
-              <button onClick={handlePause} className="p-1 rounded hover:bg-gray-100 transition" title="Pause">
+              <button onClick={handlePause} className="p-1 rounded hover:bg-bg-main transition" title="Pause">
                 <Pause size={12} className="text-severity-medium" />
               </button>
-              <button onClick={handleStop} className="p-1 rounded hover:bg-gray-100 transition" title="Stop">
+              <button onClick={handleStop} className="p-1 rounded hover:bg-bg-main transition" title="Stop">
                 <Square size={12} className="text-severity-critical" />
               </button>
             </>
           ) : status.paused ? (
-            <button onClick={handleResume} className="p-1 rounded hover:bg-gray-100 transition" title="Resume">
+            <button onClick={handleResume} className="p-1 rounded hover:bg-bg-main transition" title="Resume">
               <Play size={12} className="text-severity-info" />
             </button>
           ) : (
-            <button onClick={handleStart} className="p-1 rounded hover:bg-gray-100 transition" title="Start">
+            <button onClick={handleStart} className="p-1 rounded hover:bg-bg-main transition" title="Start">
               <Play size={12} className="text-severity-info" />
             </button>
           )}
@@ -57,15 +58,19 @@ export default function MonitoringStatusWidget({ status, onRefresh }: Props) {
       {/* Per-file monitoring list */}
       {status.active_files && status.active_files.length > 0 && (
         <div className="mt-2 pt-2 border-t border-border">
-          <div className="text-[9px] font-semibold text-text-secondary uppercase tracking-wider mb-1">
-            Currently Monitoring
+          <div className="text-[9px] font-semibold text-text-secondary uppercase tracking-wider mb-1.5">
+            Monitored Files
           </div>
-          <div className="space-y-0.5">
+          <div className="space-y-1">
             {status.active_files.map(f => (
-              <div key={f.path} className="flex items-center gap-1.5 text-[10px]">
+              <div key={f.path} className="flex items-center gap-1.5 text-[10px] bg-bg-main rounded px-2 py-1">
+                <Circle size={6} className={`shrink-0 ${f.active ? 'text-severity-info fill-severity-info' : 'text-text-secondary'}`} />
                 <FileText size={9} className="text-primary shrink-0" />
                 <span className="text-text-primary font-mono truncate flex-1">{f.filename}</span>
-                <span className="text-text-secondary">{f.lines_processed.toLocaleString()} lines</span>
+                <div className="flex items-center gap-2 text-[9px] text-text-secondary shrink-0">
+                  <span>{f.lines_processed.toLocaleString()} lines</span>
+                  <span>{formatBytes(f.last_size)}</span>
+                </div>
               </div>
             ))}
           </div>
