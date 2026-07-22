@@ -109,10 +109,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
         dispatch({ type: 'SET_STATS', payload: msg.data as DashboardStats });
         break;
       case 'evidence_created':
-        pushRef.current('info', 'Evidence Created', 'New evidence collected for investigation');
+        pushRef.current('info', 'Evidence Created', 'New evidence collected for investigation', true);
         break;
       case 'observation_promoted':
-        pushRef.current('success', 'Observation Promoted', 'Sub-threshold detection promoted to incident');
+        pushRef.current('success', 'Observation Promoted', 'Sub-threshold detection promoted to incident', true);
         break;
     }
   }, []);

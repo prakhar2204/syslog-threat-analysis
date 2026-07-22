@@ -1,15 +1,19 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { api } from '../services/api';
 import { useApp } from '../context/AppContext';
-import type { Incident, Severity, Evidence, RawLogRef } from '../types';
+import type { Incident, IncidentInsights, IncidentStatus, Severity, Evidence, RawLogRef } from '../types';
 import { formatTime, formatDateTime, relativeTime, formatDuration } from '../utils/formatters';
 import DetectionExplanation from '../components/investigation/DetectionExplanation';
 import IOCPanel from '../components/investigation/IOCPanel';
 import {
+  AttackChainViz, ThreatScoreBreakdown, BehaviouralPanel,
+  RootCauseWorkspace, SmartRecommendationsPanel,
+} from '../components/investigation/InvestigationWorkspace';
+import {
   ArrowLeft, ArrowRight, Clock, Shield, AlertTriangle, CheckCircle, XCircle,
   Search, FileText, ChevronDown, ChevronRight, Target, User, Server, Hash,
-  Fingerprint, Activity,
+  Fingerprint, Activity, TrendingUp, PlayCircle, Archive, CheckSquare, RotateCcw,
 } from 'lucide-react';
 
 function SevBadge({ s }: { s: Severity }) {
@@ -71,6 +75,7 @@ export default function Incidents() {
                   <div className="flex items-center gap-2 mb-2">
                     <SevBadge s={inc.severity} />
                     <span className="text-xs font-semibold text-text-primary flex-1 truncate">{inc.incident_type}</span>
+                    {isNew(inc.first_seen) && <span className="text-[9px] px-1.5 py-0.5 rounded bg-severity-high/15 text-severity-high border border-severity-high/30 font-bold animate-pulse">NEW</span>}
                     <span className="text-[10px] text-primary font-semibold">{inc.confidence}%</span>
                     <span className="text-[10px] px-1.5 py-0.5 rounded border border-border text-text-secondary">{inc.risk}</span>
                     <span className="text-[9px] px-1.5 py-0.5 rounded bg-bg-main text-text-secondary">{inc.status}</span>
@@ -82,8 +87,8 @@ export default function Incidents() {
                     <div className="flex items-center gap-1"><User size={9} /> {inc.target_user || '—'}</div>
                     <div className="flex items-center gap-1"><Hash size={9} /> {inc.total_events} events</div>
                     <div className="flex items-center gap-1"><Activity size={9} /> {inc.related_alert_ids.length} alerts</div>
-                    <div className="flex items-center gap-1"><Clock size={9} /> {formatTime(inc.first_seen)}</div>
-                    <div className="flex items-center gap-1"><Clock size={9} /> {formatTime(inc.last_seen)}</div>
+                    <div className="flex items-center gap-1"><Clock size={9} /> {relativeTime(inc.first_seen)}</div>
+                    <div className="flex items-center gap-1"><Clock size={9} /> Last: {relativeTime(inc.last_seen)}</div>
                     <div className="flex items-center gap-1"><Server size={9} /> {inc.triggered_rules[0] || '—'}</div>
                     <div>Duration: {formatDuration(inc.first_seen, inc.last_seen)}</div>
                   </div>
@@ -112,6 +117,11 @@ export default function Incidents() {
                       {isExpanded ? <ChevronDown size={10} /> : <ChevronRight size={10} />}
                       {isExpanded ? 'Collapse' : 'Expand'}
                     </button>
+                    <div className="ml-auto">
+                      <LifecycleButtons incident={inc} onTransition={(newStatus) => {
+                        setIncidents(prev => prev.map(i => i.incident_id === inc.incident_id ? { ...i, status: newStatus } : i));
+                      }} />
+                    </div>
                   </div>
                 </div>
 
@@ -148,7 +158,35 @@ export default function Incidents() {
   );
 }
 
-/* ---------- Raw Log Viewer ---------- */
+/* helper: is incident created within the last N minutes? */
+function isNew(ts: string, minutes = 10): boolean {
+  return Date.now() - new Date(ts).getTime() < minutes * 60 * 1000;
+}
+
+/* lifecycle transition button row */
+function LifecycleButtons({ incident, onTransition }: { incident: Incident; onTransition: (newStatus: IncidentStatus) => void }) {
+  const [loading, setLoading] = useState(false);
+
+  const act = async (action: 'investigate' | 'resolve' | 'close' | 'reopen') => {
+    setLoading(true);
+    try {
+      const res = await api.incidentAction(incident.incident_id, action);
+      onTransition(res.new_status as IncidentStatus);
+    } catch { /* ignore — status mismatch on race condition */ }
+    finally { setLoading(false); }
+  };
+
+  const s = incident.status;
+  return (
+    <div className="flex items-center gap-1.5">
+      {s === 'ACTIVE'        && <button disabled={loading} onClick={() => act('investigate')} className="flex items-center gap-1 text-[9px] px-2 py-0.5 rounded bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 transition"><PlayCircle size={9}/> Investigate</button>}
+      {s === 'INVESTIGATING' && <button disabled={loading} onClick={() => act('resolve')} className="flex items-center gap-1 text-[9px] px-2 py-0.5 rounded bg-severity-info/10 text-severity-info border border-severity-info/20 hover:bg-severity-info/20 transition"><CheckSquare size={9}/> Resolve</button>}
+      {s === 'RESOLVED'      && <button disabled={loading} onClick={() => act('close')} className="flex items-center gap-1 text-[9px] px-2 py-0.5 rounded bg-bg-main text-text-secondary border border-border hover:bg-border transition"><Archive size={9}/> Close</button>}
+      {(s === 'RESOLVED' || s === 'CLOSED' || s === 'INVESTIGATING') && <button disabled={loading} onClick={() => act('reopen')} className="flex items-center gap-1 text-[9px] px-2 py-0.5 rounded bg-severity-high/10 text-severity-high border border-severity-high/20 hover:bg-severity-high/20 transition"><RotateCcw size={9}/> Reopen</button>}
+    </div>
+  );
+}
+
 function RawLogViewer({ logRef }: { logRef: RawLogRef }) {
   const [expanded, setExpanded] = useState(false);
 
@@ -355,15 +393,23 @@ export function IncidentDetail() {
   const nav = useNavigate();
   const [incident, setIncident] = useState<Incident | null>(null);
   const [evidence, setEvidence] = useState<Evidence | null>(null);
+  const [insights, setInsights] = useState<IncidentInsights | null>(null);
 
-  useEffect(() => {
+  const reload = useCallback(() => {
     if (id) {
       api.getIncidentDetail(id).then(setIncident).catch(() => {});
       api.getEvidenceByIncident(id).then(setEvidence).catch(() => {});
+      api.getIncidentInsights(id).then(setInsights).catch(() => {});
     }
   }, [id]);
 
+  useEffect(() => { reload(); }, [reload]);
+
   if (!incident) return <div className="text-xs text-text-secondary p-4">Loading…</div>;
+
+  const scoreColor = (insights?.threat_score ?? 0) >= 70 ? 'text-severity-critical' :
+    (insights?.threat_score ?? 0) >= 50 ? 'text-severity-high' :
+    (insights?.threat_score ?? 0) >= 30 ? 'text-severity-medium' : 'text-primary';
 
   return (
     <div className="space-y-3">
@@ -371,14 +417,27 @@ export function IncidentDetail() {
         <ArrowLeft size={14} /> Back to Incidents
       </button>
 
-      {/* Header */}
+      {/* Header — now with threat score and priority */}
       <div className={`bg-bg-card border-l-4 ${sevBorder(incident.severity)} border border-border rounded p-4`}>
         <div className="flex items-center gap-3 mb-3">
           <SevBadge s={incident.severity} />
           <span className="text-sm font-semibold text-text-primary">{incident.incident_type}</span>
-          <span className="text-[10px] px-1.5 py-0.5 rounded border border-border text-text-secondary">{incident.status}</span>
+          <span className={`text-[10px] px-1.5 py-0.5 rounded font-semibold border ${
+            incident.status === 'ACTIVE'        ? 'border-severity-high/40 bg-severity-high/10 text-severity-high' :
+            incident.status === 'INVESTIGATING' ? 'border-primary/40 bg-primary/10 text-primary' :
+            incident.status === 'RESOLVED'      ? 'border-severity-info/40 bg-severity-info/10 text-severity-info' :
+                                                  'border-border bg-bg-main text-text-secondary'
+          }`}>{incident.status}</span>
           <span className="text-[10px] px-1.5 py-0.5 rounded border border-border text-text-secondary">{incident.risk}</span>
-          <span className="text-xs text-primary font-semibold ml-auto">{incident.confidence}% confidence</span>
+          {insights && (
+            <>
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-primary/10 text-primary font-semibold">#{insights.priority} in queue</span>
+              <span className={`text-sm font-bold ml-auto flex items-center gap-1 ${scoreColor}`}>
+                <TrendingUp size={12} /> {insights.threat_score.toFixed(0)}/100
+              </span>
+            </>
+          )}
+          {!insights && <span className="text-xs text-primary font-semibold ml-auto">{incident.confidence}% confidence</span>}
         </div>
         <div className="grid grid-cols-4 gap-3 text-xs">
           <div><span className="text-text-secondary">Incident ID:</span><br /><span className="font-mono text-[10px]">{incident.incident_id}</span></div>
@@ -390,11 +449,10 @@ export function IncidentDetail() {
           <div><span className="text-text-secondary">First Seen:</span><br />{formatDateTime(incident.first_seen)}</div>
           <div><span className="text-text-secondary">Last Seen:</span><br />{formatDateTime(incident.last_seen)}</div>
         </div>
-        {/* Duration bar */}
         <div className="mt-2 pt-2 border-t border-border text-[10px] text-text-secondary flex items-center gap-3">
           <span>Duration: <strong className="text-text-primary">{formatDuration(incident.first_seen, incident.last_seen)}</strong></span>
           <span>·</span>
-          <span>{relativeTime(incident.last_seen)}</span>
+          {relativeTime(incident.last_seen)}
           {incident.mitre_techniques.length > 0 && (
             <>
               <span>·</span>
@@ -403,8 +461,30 @@ export function IncidentDetail() {
               ))}
             </>
           )}
+          <div className="ml-auto">
+            <LifecycleButtons incident={incident} onTransition={(newStatus) => {
+              setIncident(prev => prev ? { ...prev, status: newStatus } : null);
+            }} />
+          </div>
         </div>
       </div>
+
+      {/* Phase 5.5: Attack Chain Visualization */}
+      {insights && <AttackChainViz insights={insights} />}
+
+      {/* Phase 5.5: Threat Score + Investigation Insights side by side */}
+      {insights && (
+        <div className="grid grid-cols-2 gap-3">
+          <ThreatScoreBreakdown insights={insights} />
+          <RootCauseWorkspace insights={insights} />
+        </div>
+      )}
+
+      {/* Phase 5.5: Behavioural Analysis */}
+      {insights && <BehaviouralPanel findings={insights.behavioural_findings} />}
+
+      {/* Phase 5.5: Smart Recommendations */}
+      {insights && <SmartRecommendationsPanel recs={insights.smart_recommendations} />}
 
       {/* Detection Explanation */}
       <DetectionExplanation incident={incident} evidence={evidence} />
@@ -412,27 +492,11 @@ export function IncidentDetail() {
       {/* Attack Timeline */}
       <AttackTimeline incident={incident} />
 
-      {/* Evidence */}
-      {evidence && <EvidenceSection evidence={evidence} />}
+      {/* Evidence — anchor target for attack chain stage clicks */}
+      {evidence && <div id="evidence-section"><EvidenceSection evidence={evidence} /></div>}
 
       {/* IOC Intelligence */}
-      {evidence && <IOCPanel evidence={evidence} incident={incident} />}
-
-      {/* Recommendations */}
-      {incident.recommendations.length > 0 && (
-        <div className="bg-bg-card border border-border rounded p-4">
-          <div className="text-xs font-semibold text-text-primary flex items-center gap-2 mb-2">
-            <CheckCircle size={14} className="text-severity-info" /> Recommended Actions
-          </div>
-          <ul className="space-y-1">
-            {incident.recommendations.map((rec, i) => (
-              <li key={i} className="text-xs text-text-primary flex items-start gap-2">
-                <span className="text-text-secondary">•</span> {rec}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+      {evidence && <div id="ioc-section"><IOCPanel evidence={evidence} incident={incident} /></div>}
 
       {/* Triggered Rules & MITRE */}
       <div className="grid grid-cols-2 gap-3">

@@ -1,7 +1,8 @@
 /* SysLog Threat Analysis - API Client */
 
 import type {
-  Alert, DashboardStats, Evidence, Incident, LogDetail, LogFile,
+  Alert, AttackChain, DashboardIntelligence, DashboardStats, Evidence,
+  Incident, IncidentInsights, IOCRelationship, LogDetail, LogFile,
   MonitoringStatus, Observation, PaginatedLogs, PipelineStats,
   SimScenario, SimulationStatus,
 } from '../types';
@@ -50,6 +51,11 @@ export const api = {
   // -- Incidents --
   getIncidents: () => request<Incident[]>('/incidents'),
   getIncidentDetail: (id: string) => request<Incident>(`/incidents/${id}`),
+  incidentAction: (id: string, action: 'investigate' | 'resolve' | 'close' | 'reopen', note = '') =>
+    request<{ status: string; previous_status: string; new_status: string }>(`/incidents/${id}/action`, {
+      method: 'POST',
+      body: JSON.stringify({ action, note }),
+    }),
 
   // -- Monitoring --
   getMonitorStatus: () => request<MonitoringStatus>('/monitor/status'),
@@ -112,4 +118,12 @@ export const api = {
   exportReport: (format: 'json' | 'csv' | 'pdf') => {
     window.open(`${BASE}/export/${format}`, '_blank');
   },
+
+  // -- Phase 5.5: Intelligence --
+  getDashboardIntelligence: () => request<DashboardIntelligence>('/dashboard-intelligence'),
+  getAttackChains: () => request<{ chains: AttackChain[]; total: number }>('/attack-chains'),
+  getIncidentInsights: (id: string) => request<IncidentInsights>(`/incidents/${id}/insights`),
+  getIOCRelationships: (limit = 20) => request<{ iocs: IOCRelationship[]; total: number }>(`/ioc-relationships?limit=${limit}`),
+  getIOCDetail: (type: string, value: string) => request<{ ioc: IOCRelationship; related: IOCRelationship[] }>(`/ioc-relationships/${type}/${encodeURIComponent(value)}`),
+  getIOCsForIncident: (incidentId: string) => request<{ iocs: IOCRelationship[]; total: number }>(`/ioc-relationships/incident/${incidentId}`),
 };

@@ -17,6 +17,7 @@ from fastapi.responses import Response
 
 from api.schemas import (
     AlertActionRequest,
+    IncidentActionRequest,
     MonitorStartRequest,
     MonitorStopResponse,
     SimulationGenerateRequest,
@@ -178,6 +179,62 @@ async def get_incident_detail(incident_id: str):
     result = incident.model_dump(mode="json")
     result["related_logs"] = related_logs
     return result
+
+
+@router.post("/incidents/{incident_id}/action")
+async def incident_action(incident_id: str, request: IncidentActionRequest):
+    """
+    Transition an incident through its lifecycle:
+      active -> investigate -> resolve -> close -> reopen
+    Allowed transitions:
+      investigate : ACTIVE       -> INVESTIGATING
+      resolve     : INVESTIGATING -> RESOLVED
+      close       : RESOLVED     -> CLOSED
+      reopen      : any          -> ACTIVE
+    """
+    from models.events import IncidentStatus
+
+    # Locate incident in correlation engine or pipeline buffer
+    incident = pipeline.correlation_engine.get_incident(incident_id)
+    if incident is None:
+        incident = next((i for i in pipeline.incidents if i.incident_id == incident_id), None)
+    if incident is None:
+        raise HTTPException(status_code=404, detail="Incident not found")
+
+    action = request.action.lower()
+    current = incident.status
+
+    transition_map = {
+        "investigate": (IncidentStatus.ACTIVE,        IncidentStatus.INVESTIGATING),
+        "resolve":     (IncidentStatus.INVESTIGATING,  IncidentStatus.RESOLVED),
+        "close":       (IncidentStatus.RESOLVED,       IncidentStatus.CLOSED),
+        "reopen":      (None,                          IncidentStatus.ACTIVE),  # any -> ACTIVE
+    }
+
+    if action not in transition_map:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Unknown action '{action}'. Use: investigate, resolve, close, reopen"
+        )
+
+    required_from, new_status = transition_map[action]
+    if required_from is not None and current != required_from:
+        raise HTTPException(
+            status_code=409,
+            detail=f"Cannot '{action}' an incident in status '{current.value}'. Expected '{required_from.value}'."
+        )
+
+    incident.status = new_status
+    logger.info(
+        "Incident %s status: %s -> %s (note: %s)",
+        incident_id, current.value, new_status.value, request.note or "<none>"
+    )
+    return {
+        "status": "ok",
+        "incident_id": incident_id,
+        "previous_status": current.value,
+        "new_status": new_status.value,
+    }
 
 
 # ---------------------------------------------------------------------------

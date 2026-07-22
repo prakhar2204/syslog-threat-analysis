@@ -5,6 +5,7 @@ import { useApp } from '../context/AppContext';
 import { api } from '../services/api';
 import ActiveThreatCenter from '../components/dashboard/ActiveThreatCenter';
 import ThreatSummary from '../components/dashboard/ThreatSummary';
+import DashboardIntel from '../components/dashboard/DashboardIntel';
 import LogStream from '../components/dashboard/LogStream';
 import InvestigationPanel from '../components/dashboard/InvestigationPanel';
 import DashboardCharts from '../components/charts/DashboardCharts';
@@ -56,7 +57,10 @@ export default function Dashboard() {
       {/* 1. Active Threat Center — highest priority */}
       <ActiveThreatCenter incidents={state.incidents} />
 
-      {/* 2. Threat Summary metrics */}
+      {/* 2. SOC Intelligence */}
+      <DashboardIntel />
+
+      {/* 3. Threat Summary metrics */}
       <ThreatSummary />
 
       {/* 3. Monitoring Sources */}

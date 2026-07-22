@@ -64,6 +64,99 @@ export interface Incident {
   mitre_techniques: string[];
   correlation_explanation: string;
   related_logs?: LogEntry[];
+  // Phase 5.4 intelligence fields
+  attack_chain_id?: string | null;
+  attack_chain_stage?: string;
+  attack_chain_progress?: number;
+  attack_chain_stages_completed?: string[];
+  attack_chain_stages_missing?: string[];
+  estimated_objective?: string;
+  threat_score?: number;
+  threat_score_breakdown?: Record<string, number>;
+  priority?: number;
+  behavioural_findings?: string[];
+  root_cause?: string;
+  smart_recommendations?: SmartRecommendation[];
+  executive_summary?: string;
+  technical_summary?: string;
+  attack_narrative?: string;
+  affected_assets?: string[];
+  mitre_summary?: string;
+  merged_incident_ids?: string[];
+  is_merged?: boolean;
+}
+
+export interface SmartRecommendation {
+  action: string;
+  priority: string;
+  reason: string;
+  impact: string;
+  status?: 'pending' | 'in_progress' | 'completed';
+}
+
+export interface AttackChain {
+  chain_id: string;
+  chain_name: string;
+  chain_type: string;
+  stages: string[];
+  stages_completed: string[];
+  stages_missing: string[];
+  progress: number;
+  objective: string;
+  incident_count: number;
+  first_seen: string;
+}
+
+export interface IOCRelationship {
+  ioc_type: string;
+  value: string;
+  first_seen: string | null;
+  last_seen: string | null;
+  occurrences: number;
+  related_alerts: number;
+  related_incidents: number;
+  related_users: string[];
+  related_services: string[];
+  related_hosts: string[];
+  related_rules: string[];
+  related_ips: string[];
+  confidence: number;
+}
+
+export interface DashboardIntelligence {
+  most_dangerous_attack: { incident_id: string; type: string; threat_score: number; severity: string; confidence: number } | null;
+  most_active_attacker: { ip: string; event_count: number } | null;
+  most_targeted_user: { user: string; event_count: number } | null;
+  most_targeted_service: { service: string; event_count: number } | null;
+  top_iocs: IOCRelationship[];
+  attack_chains: AttackChain[];
+  soc_queue: { incident_id: string; type: string; severity: string; threat_score: number; priority: number; confidence: number }[];
+  behaviour_findings: { type: string; ip?: string; user?: string; event_count?: number; targets?: number; source_count?: number; description: string }[];
+  total_incidents: number;
+  merged_incidents: number;
+}
+
+export interface IncidentInsights {
+  incident_id: string;
+  executive_summary: string;
+  technical_summary: string;
+  attack_narrative: string;
+  root_cause: string;
+  affected_assets: string[];
+  mitre_summary: string;
+  behavioural_findings: string[];
+  smart_recommendations: SmartRecommendation[];
+  attack_chain: {
+    chain_id: string | null;
+    stage: string;
+    progress: number;
+    stages_completed: string[];
+    stages_missing: string[];
+    estimated_objective: string;
+  };
+  threat_score: number;
+  threat_score_breakdown: Record<string, number>;
+  priority: number;
 }
 
 export interface DashboardStats {

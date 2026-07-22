@@ -27,6 +27,11 @@ class AlertActionRequest(BaseModel):
     action: str  # "acknowledge" or "resolve"
 
 
+class IncidentActionRequest(BaseModel):
+    action: str  # "investigate", "resolve", "close", "reopen"
+    note: str = ""  # Optional analyst note
+
+
 class SimulationStartRequest(BaseModel):
     scenarios: Optional[list[str]] = None
     speed: str = "normal"
