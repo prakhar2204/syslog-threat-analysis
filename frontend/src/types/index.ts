@@ -359,3 +359,37 @@ export interface LogDetail {
   triggered_alerts: Alert[];
   triggered_rules: DetectionRule[];
 }
+
+// Phase 5.6: Upload Investigation
+export interface UploadSession {
+  session_id: string;
+  filename: string;
+  upload_time: string;
+  lines: number;
+  events: number;
+  alerts: number;
+  incidents: number;
+  duration_seconds: number;
+  source_type: string;
+}
+
+// Phase 5.6: Pipeline Health
+export interface PipelineStageHealth {
+  status: 'active' | 'idle' | 'error';
+  processed: number;
+  errors: number;
+  rules_active?: number;
+  scenarios_active?: number;
+  engines?: number;
+  active_investigations?: number;
+  total?: number;
+}
+
+export interface PipelineHealth {
+  monitoring: PipelineStageHealth;
+  parser: PipelineStageHealth;
+  detection: PipelineStageHealth;
+  correlation: PipelineStageHealth;
+  analysis: PipelineStageHealth;
+  investigation: PipelineStageHealth;
+}

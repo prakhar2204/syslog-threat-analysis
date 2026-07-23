@@ -1,4 +1,4 @@
-/* SysLog Threat Analysis - Dashboard Page */
+/* SysLog Threat Analysis — Dashboard (Phase 5.6: Analyst-First Layout) */
 
 import { useEffect, useState, useCallback } from 'react';
 import { useApp } from '../context/AppContext';
@@ -10,20 +10,17 @@ import LogStream from '../components/dashboard/LogStream';
 import InvestigationPanel from '../components/dashboard/InvestigationPanel';
 import DashboardCharts from '../components/charts/DashboardCharts';
 import IncidentList from '../components/dashboard/IncidentList';
-import MonitoringSources from '../components/monitoring/MonitoringSources';
 import MonitoringStatusWidget from '../components/monitoring/MonitoringStatus';
 import PipelineVisualizer from '../components/monitoring/PipelineVisualizer';
-import type { DashboardStats, MonitoringStatus, SimulationStatus, PipelineStats, Alert, Incident } from '../types';
+import type { DashboardStats, MonitoringStatus, PipelineStats, Alert, Incident } from '../types';
 
 export default function Dashboard() {
   const { state, dispatch } = useApp();
   const [monitorStatus, setMonitorStatus] = useState<MonitoringStatus | null>(null);
-  const [simStatus, setSimStatus] = useState<SimulationStatus | null>(null);
   const [pipelineStats, setPipelineStats] = useState<PipelineStats | null>(null);
 
   const refreshStatus = useCallback(() => {
     api.getMonitorStatus().then(setMonitorStatus).catch(() => {});
-    api.getSimulationStatus().then(setSimStatus).catch(() => {});
     api.getPipelineStats().then(setPipelineStats).catch(() => {});
   }, []);
 
@@ -54,35 +51,32 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-3">
-      {/* 1. Active Threat Center — highest priority */}
+      {/* 1. Active Threat Center — analyst's first view */}
       <ActiveThreatCenter incidents={state.incidents} />
 
-      {/* 2. SOC Intelligence */}
+      {/* 2. SOC Intelligence Panel */}
       <DashboardIntel />
 
-      {/* 3. Threat Summary metrics */}
+      {/* 3. Threat Summary metrics row */}
       <ThreatSummary />
 
-      {/* 3. Monitoring Sources */}
-      <MonitoringSources monitor={monitorStatus} simulation={simStatus} />
-
-      {/* 4. Pipeline + Monitoring Status */}
-      <div className="grid grid-cols-3 gap-3">
-        <div className="col-span-2">
-          <PipelineVisualizer stats={pipelineStats} />
-        </div>
-        <div>
-          <MonitoringStatusWidget status={monitorStatus} onRefresh={refreshStatus} />
-        </div>
-      </div>
-
-      {/* 5. Incidents + Log Stream */}
+      {/* 4. Main content: Incidents + Log Stream side by side */}
       <div className="grid grid-cols-3 gap-3">
         <div className="col-span-2">
           <LogStream logs={state.logs} />
         </div>
         <div>
           <IncidentList incidents={state.incidents} />
+        </div>
+      </div>
+
+      {/* 5. Pipeline + Monitoring Status (collapsed view) */}
+      <div className="grid grid-cols-3 gap-3">
+        <div className="col-span-2">
+          <PipelineVisualizer stats={pipelineStats} />
+        </div>
+        <div>
+          <MonitoringStatusWidget status={monitorStatus} onRefresh={refreshStatus} />
         </div>
       </div>
 

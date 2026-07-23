@@ -39,7 +39,13 @@ export default function IncidentList({ incidents }: Props) {
         <span className="text-[9px] text-text-secondary">{incidents.length} total</span>
       </div>
       {incidents.length === 0 ? (
-        <div className="p-4 text-center text-xs text-text-secondary">No incidents detected.</div>
+        <div className="p-6 text-center">
+          <Activity size={20} className="text-text-secondary/30 mx-auto mb-2" />
+          <div className="text-xs text-text-secondary font-medium">No incidents detected</div>
+          <div className="text-[10px] text-text-secondary/60 mt-1">
+            Incidents appear when correlation rules trigger
+          </div>
+        </div>
       ) : (
         <div className="divide-y divide-border">
           {incidents.slice(0, 8).map((inc) => (

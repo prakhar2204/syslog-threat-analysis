@@ -1,4 +1,4 @@
-/* SysLog Threat Analysis — Global Application State */
+/* SysLog Threat Analysis — Global Application State (Phase 5.6) */
 
 import { createContext, useContext, useCallback, useEffect, useReducer, useRef, type ReactNode } from 'react';
 import type { Alert, DashboardStats, Incident, LogEntry, WSMessage } from '../types';
@@ -86,11 +86,23 @@ export function AppProvider({ children }: { children: ReactNode }) {
       case 'new_alert': {
         const alert = msg.data as Alert;
         dispatch({ type: 'ADD_ALERT', payload: alert });
-        if (alert.severity === 'CRITICAL' || alert.severity === 'HIGH') {
+        // Phase 5.6: Only CRITICAL alerts get a toast popup
+        if (alert.severity === 'CRITICAL') {
           pushRef.current(
-            alert.severity === 'CRITICAL' ? 'critical' : 'warning',
-            `${alert.severity} Alert`,
-            `${alert.rule_name} — ${alert.source_ip || 'unknown'}`
+            'critical',
+            `CRITICAL Alert: ${alert.rule_name}`,
+            `${alert.source_ip || 'unknown'} — ${alert.description?.slice(0, 80) || ''}`,
+            'detection',
+            true, // showToast
+          );
+        } else if (alert.severity === 'HIGH') {
+          // HIGH alerts go to center only (no toast)
+          pushRef.current(
+            'warning',
+            `${alert.severity} Alert: ${alert.rule_name}`,
+            `${alert.source_ip || 'unknown'}`,
+            'detection',
+            false,
           );
         }
         break;
@@ -98,21 +110,36 @@ export function AppProvider({ children }: { children: ReactNode }) {
       case 'new_incident': {
         const inc = msg.data as Incident;
         dispatch({ type: 'ADD_INCIDENT', payload: inc });
-        pushRef.current(
-          inc.severity === 'CRITICAL' ? 'critical' : 'warning',
-          `Incident: ${inc.incident_type}`,
-          `${inc.confidence}% confidence · ${inc.source_ips[0] || '—'} → ${inc.target_user || '—'}`
-        );
+        // Phase 5.6: Only CRITICAL new incidents get toast
+        if (inc.severity === 'CRITICAL') {
+          pushRef.current(
+            'critical',
+            `Critical Incident: ${inc.incident_type}`,
+            `${inc.confidence}% confidence · ${inc.source_ips[0] || '—'} → ${inc.target_user || '—'}`,
+            'incidents',
+            true, // showToast
+          );
+        } else {
+          // Non-critical incidents: center only
+          pushRef.current(
+            inc.severity === 'HIGH' ? 'warning' : 'info',
+            `Incident: ${inc.incident_type}`,
+            `${inc.source_ips[0] || '—'} → ${inc.target_user || '—'}`,
+            'incidents',
+            false,
+          );
+        }
         break;
       }
       case 'stats_update':
         dispatch({ type: 'SET_STATS', payload: msg.data as DashboardStats });
         break;
       case 'evidence_created':
-        pushRef.current('info', 'Evidence Created', 'New evidence collected for investigation', true);
+        // Evidence: center only, no toast
+        pushRef.current('info', 'Evidence Collected', 'New evidence added to investigation', 'evidence', false);
         break;
       case 'observation_promoted':
-        pushRef.current('success', 'Observation Promoted', 'Sub-threshold detection promoted to incident', true);
+        pushRef.current('success', 'Observation Promoted', 'Detection promoted to incident', 'detection', false);
         break;
     }
   }, []);

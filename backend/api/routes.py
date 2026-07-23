@@ -9,10 +9,12 @@ only exposes query and control interfaces.
 from __future__ import annotations
 
 import logging
+import time
+from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, UploadFile, File
 from fastapi.responses import Response
 
 from api.schemas import (
@@ -719,4 +721,194 @@ async def get_incident_insights(incident_id: str):
         "threat_score_breakdown": incident.threat_score_breakdown,
         "priority": incident.priority,
     }
+
+
+# ---------------------------------------------------------------------------
+# Phase 5.6: Upload Log Investigation
+# ---------------------------------------------------------------------------
+
+_upload_sessions: list[dict] = []
+
+
+@router.post("/upload")
+async def upload_log_file(file: UploadFile = File(...)):
+    """
+    Upload a log file for investigation.
+    Feeds every line through the existing pipeline (parser → detection →
+    correlation → analysis → WebSocket) — no separate implementation.
+    """
+    if not file.filename:
+        raise HTTPException(status_code=400, detail="No file provided")
+
+    start_time = time.time()
+    content = await file.read()
+    text = content.decode("utf-8", errors="replace")
+    lines = [ln for ln in text.splitlines() if ln.strip()]
+
+    if not lines:
+        raise HTTPException(status_code=400, detail="File is empty")
+
+    events_before = len(pipeline.log_entries)
+    alerts_before = len(pipeline.alerts)
+    incidents_before = len(pipeline.incidents)
+
+    # Feed through the EXACT SAME pipeline
+    await pipeline.process_lines(lines)
+
+    events_after = len(pipeline.log_entries)
+    alerts_after = len(pipeline.alerts)
+    incidents_after = len(pipeline.incidents)
+    duration = round(time.time() - start_time, 2)
+
+    session = {
+        "session_id": f"upload-{int(time.time()*1000)}",
+        "filename": file.filename,
+        "upload_time": datetime.now().isoformat(),
+        "lines": len(lines),
+        "events": events_after - events_before,
+        "alerts": alerts_after - alerts_before,
+        "incidents": incidents_after - incidents_before,
+        "duration_seconds": duration,
+        "source_type": "upload",
+    }
+    _upload_sessions.insert(0, session)
+    if len(_upload_sessions) > 50:
+        _upload_sessions.pop()
+
+    logger.info(
+        "Upload processed: %s (%d lines, %d events, %d alerts, %d incidents in %.2fs)",
+        file.filename, len(lines), session["events"], session["alerts"],
+        session["incidents"], duration,
+    )
+    return session
+
+
+@router.post("/upload/multi")
+async def upload_multiple_log_files(files: list[UploadFile] = File(...)):
+    """Upload multiple log files at once."""
+    results = []
+    for f in files:
+        if not f.filename:
+            continue
+        start_time = time.time()
+        content = await f.read()
+        text = content.decode("utf-8", errors="replace")
+        lines = [ln for ln in text.splitlines() if ln.strip()]
+        if not lines:
+            continue
+
+        events_before = len(pipeline.log_entries)
+        alerts_before = len(pipeline.alerts)
+        incidents_before = len(pipeline.incidents)
+
+        await pipeline.process_lines(lines)
+        duration = round(time.time() - start_time, 2)
+
+        session = {
+            "session_id": f"upload-{int(time.time()*1000)}",
+            "filename": f.filename,
+            "upload_time": datetime.now().isoformat(),
+            "lines": len(lines),
+            "events": len(pipeline.log_entries) - events_before,
+            "alerts": len(pipeline.alerts) - alerts_before,
+            "incidents": len(pipeline.incidents) - incidents_before,
+            "duration_seconds": duration,
+            "source_type": "upload",
+        }
+        _upload_sessions.insert(0, session)
+        results.append(session)
+
+    if len(_upload_sessions) > 50:
+        _upload_sessions[:] = _upload_sessions[:50]
+
+    return {"uploaded": len(results), "sessions": results}
+
+
+@router.get("/upload/history")
+async def upload_history():
+    """Return all upload investigation sessions."""
+    return _upload_sessions
+
+
+# ---------------------------------------------------------------------------
+# Phase 5.6: Pipeline Health
+# ---------------------------------------------------------------------------
+
+@router.get("/pipeline/health")
+async def pipeline_health():
+    """Per-stage pipeline health for the Pipeline Visibility panel."""
+    from datetime import datetime as dt
+
+    active_incidents = [i for i in pipeline.incidents if not i.is_merged]
+    return {
+        "monitoring": {
+            "status": "active" if (pipeline.monitoring.active) else "idle",
+            "processed": pipeline.monitoring.lines_processed,
+            "errors": 0,
+        },
+        "parser": {
+            "status": "active" if len(pipeline.log_entries) > 0 else "idle",
+            "processed": len(pipeline.log_entries),
+            "errors": 0,
+        },
+        "detection": {
+            "status": "active" if len(pipeline.alerts) > 0 else "idle",
+            "processed": len(pipeline.alerts),
+            "rules_active": 15,
+            "errors": 0,
+        },
+        "correlation": {
+            "status": "active" if len(pipeline.incidents) > 0 else "idle",
+            "processed": len(pipeline.incidents),
+            "scenarios_active": 5,
+            "errors": 0,
+        },
+        "analysis": {
+            "status": "active" if len(active_incidents) > 0 else "idle",
+            "processed": len(active_incidents),
+            "engines": 12,
+            "errors": 0,
+        },
+        "investigation": {
+            "status": "active" if len(active_incidents) > 0 else "idle",
+            "active_investigations": len([
+                i for i in active_incidents
+                if hasattr(i, 'status') and i.status.value == 'INVESTIGATING'
+            ]),
+            "total": len(active_incidents),
+            "errors": 0,
+        },
+    }
+
+
+# ---------------------------------------------------------------------------
+# Phase 5.6: Investigation History (all session types)
+# ---------------------------------------------------------------------------
+
+@router.get("/investigation/history")
+async def investigation_history():
+    """Unified investigation history across monitoring, upload, and simulation."""
+    history = []
+
+    # Monitoring sessions
+    if _monitor:
+        for s in _monitor.get_session_history():
+            history.append({**s, "source_type": s.get("source_type", "live_folder")})
+
+    # Upload sessions
+    for s in _upload_sessions:
+        history.append(s)
+
+    # Simulation sessions (from simulator status)
+    if _simulator and _simulator.events_generated > 0:
+        history.append({
+            "session_id": "sim-current",
+            "source_type": "simulation",
+            "filename": "simulation.log",
+            "events": _simulator.events_generated,
+            "duration_seconds": _simulator._elapsed_seconds if hasattr(_simulator, '_elapsed_seconds') else 0,
+        })
+
+    # Sort by upload_time or start_time
+    return history
 

@@ -3,8 +3,8 @@
 import type {
   Alert, AttackChain, DashboardIntelligence, DashboardStats, Evidence,
   Incident, IncidentInsights, IOCRelationship, LogDetail, LogFile,
-  MonitoringStatus, Observation, PaginatedLogs, PipelineStats,
-  SimScenario, SimulationStatus,
+  MonitoringStatus, Observation, PaginatedLogs, PipelineHealth, PipelineStats,
+  SimScenario, SimulationStatus, UploadSession,
 } from '../types';
 
 const BASE = import.meta.env.VITE_API_BASE_URL
@@ -126,4 +126,33 @@ export const api = {
   getIOCRelationships: (limit = 20) => request<{ iocs: IOCRelationship[]; total: number }>(`/ioc-relationships?limit=${limit}`),
   getIOCDetail: (type: string, value: string) => request<{ ioc: IOCRelationship; related: IOCRelationship[] }>(`/ioc-relationships/${type}/${encodeURIComponent(value)}`),
   getIOCsForIncident: (incidentId: string) => request<{ iocs: IOCRelationship[]; total: number }>(`/ioc-relationships/incident/${incidentId}`),
+
+  // -- Phase 5.6: Upload Investigation --
+  uploadFile: async (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    const res = await fetch(`${BASE}/upload`, { method: 'POST', body: formData });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: res.statusText }));
+      throw new Error(err.detail || res.statusText);
+    }
+    return res.json() as Promise<UploadSession>;
+  },
+  uploadMultiple: async (files: File[]) => {
+    const formData = new FormData();
+    files.forEach(f => formData.append('files', f));
+    const res = await fetch(`${BASE}/upload/multi`, { method: 'POST', body: formData });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: res.statusText }));
+      throw new Error(err.detail || res.statusText);
+    }
+    return res.json() as Promise<{ uploaded: number; sessions: UploadSession[] }>;
+  },
+  getUploadHistory: () => request<UploadSession[]>('/upload/history'),
+
+  // -- Phase 5.6: Pipeline Health --
+  getPipelineHealth: () => request<PipelineHealth>('/pipeline/health'),
+
+  // -- Phase 5.6: Investigation History --
+  getInvestigationHistory: () => request<Record<string, unknown>[]>('/investigation/history'),
 };

@@ -1,46 +1,54 @@
-/* SysLog Threat Analysis — Notification Context (Phase 5.5: Aggregated) */
+/* SysLog Threat Analysis — Notification Context (Phase 5.6: Notification Center) */
 
 import { createContext, useCallback, useContext, useRef, useState, type ReactNode } from 'react';
 
 export type NotificationType = 'critical' | 'warning' | 'info' | 'success';
+export type NotificationCategory = 'system' | 'detection' | 'monitoring' | 'evidence' | 'incidents';
 
 export interface Notification {
   id: string;
   type: NotificationType;
+  category: NotificationCategory;
   title: string;
   message: string;
-  count: number;        // aggregated count
+  count: number;
   timestamp: number;
+  read: boolean;
   exiting?: boolean;
 }
 
 interface NotificationContextValue {
-  notifications: Notification[];
-  history: Notification[];
-  push: (type: NotificationType, title: string, message: string, aggregate?: boolean) => void;
+  notifications: Notification[];        // visible toasts (critical only)
+  center: Notification[];               // all notifications for Notification Center
+  unreadCount: number;
+  push: (type: NotificationType, title: string, message: string, category?: NotificationCategory, showToast?: boolean) => void;
   dismiss: (id: string) => void;
-  clearHistory: () => void;
+  markRead: (id: string) => void;
+  markAllRead: () => void;
+  clearAll: () => void;
 }
 
 const NotificationContext = createContext<NotificationContextValue>({
   notifications: [],
-  history: [],
+  center: [],
+  unreadCount: 0,
   push: () => {},
   dismiss: () => {},
-  clearHistory: () => {},
+  markRead: () => {},
+  markAllRead: () => {},
+  clearAll: () => {},
 });
 
-const MAX_VISIBLE = 6;
-const AUTO_DISMISS_MS = 6000;
-// Aggregation window: same-type events within this window merge into one toast
-const AGGREGATE_WINDOW_MS = 2000;
+const MAX_VISIBLE = 4;
+const AUTO_DISMISS_MS = 5000;
+const MAX_CENTER = 200;
+const AGGREGATE_WINDOW_MS = 3000;
 
 export function NotificationProvider({ children }: { children: ReactNode }) {
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [history, setHistory] = useState<Notification[]>([]);
+  const [center, setCenter] = useState<Notification[]>([]);
   const counterRef = useRef(0);
   const timersRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
-  // Map from groupKey -> notification id (for aggregation)
   const groupKeyRef = useRef<Map<string, { id: string; timer: ReturnType<typeof setTimeout> }>>(new Map());
 
   const dismiss = useCallback((id: string) => {
@@ -56,68 +64,95 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     type: NotificationType,
     title: string,
     message: string,
-    aggregate = false,
+    category: NotificationCategory = 'system',
+    showToast = false,
   ) => {
-    const groupKey = aggregate ? `${type}::${title}` : null;
+    const groupKey = `${type}::${category}::${title}`;
 
-    // --- Aggregation: merge into existing visible toast of same type+title ---
-    if (groupKey && groupKeyRef.current.has(groupKey)) {
-      const { id, timer } = groupKeyRef.current.get(groupKey)!;
-      // Increment count on existing toast
-      setNotifications(prev => prev.map(n =>
-        n.id === id ? { ...n, count: n.count + 1, timestamp: Date.now() } : n
+    // Check for aggregation in center
+    const existingGroup = groupKeyRef.current.get(groupKey);
+
+    if (existingGroup) {
+      // Aggregate: increment count in center
+      setCenter(prev => prev.map(n =>
+        n.id === existingGroup.id
+          ? { ...n, count: n.count + 1, timestamp: Date.now(), read: false }
+          : n
       ));
-      // Reset the auto-dismiss timer
-      clearTimeout(timer);
+      // Also update toast if visible
+      if (showToast) {
+        setNotifications(prev => prev.map(n =>
+          n.id === existingGroup.id ? { ...n, count: n.count + 1, timestamp: Date.now() } : n
+        ));
+      }
+      // Reset aggregation timer
+      clearTimeout(existingGroup.timer);
       const newTimer = setTimeout(() => {
-        dismiss(id);
         groupKeyRef.current.delete(groupKey);
-      }, AUTO_DISMISS_MS);
-      groupKeyRef.current.set(groupKey, { id, timer: newTimer });
+      }, AGGREGATE_WINDOW_MS);
+      groupKeyRef.current.set(groupKey, { id: existingGroup.id, timer: newTimer });
       return;
     }
 
-    // --- New notification ---
+    // New notification
     counterRef.current += 1;
     const id = `notif-${counterRef.current}-${Date.now()}`;
-    const notif: Notification = { id, type, title, message, count: 1, timestamp: Date.now() };
+    const notif: Notification = {
+      id, type, category, title, message, count: 1,
+      timestamp: Date.now(), read: false,
+    };
 
-    setNotifications(prev => {
-      const next = [notif, ...prev];
-      if (next.length > MAX_VISIBLE) {
-        const removed = next.slice(MAX_VISIBLE);
-        removed.forEach(n => {
-          const t = timersRef.current.get(n.id);
-          if (t) { clearTimeout(t); timersRef.current.delete(n.id); }
-          // Remove from group key tracking if present
-          for (const [key, val] of groupKeyRef.current.entries()) {
-            if (val.id === n.id) { groupKeyRef.current.delete(key); }
-          }
-        });
-        return next.slice(0, MAX_VISIBLE);
-      }
-      return next;
-    });
+    // Always add to center
+    setCenter(prev => [notif, ...prev].slice(0, MAX_CENTER));
 
-    // Add to persistent history
-    setHistory(prev => [notif, ...prev].slice(0, 100));
+    // Only show toast for critical items
+    if (showToast) {
+      setNotifications(prev => {
+        const next = [notif, ...prev];
+        if (next.length > MAX_VISIBLE) {
+          const removed = next.slice(MAX_VISIBLE);
+          removed.forEach(n => {
+            const t = timersRef.current.get(n.id);
+            if (t) { clearTimeout(t); timersRef.current.delete(n.id); }
+          });
+          return next.slice(0, MAX_VISIBLE);
+        }
+        return next;
+      });
 
-    const timer = setTimeout(() => {
-      dismiss(id);
-      if (groupKey) groupKeyRef.current.delete(groupKey);
-    }, AUTO_DISMISS_MS);
-    timersRef.current.set(id, timer);
+      const timer = setTimeout(() => {
+        dismiss(id);
+      }, AUTO_DISMISS_MS);
+      timersRef.current.set(id, timer);
+    }
 
     // Register for aggregation
-    if (groupKey) {
-      groupKeyRef.current.set(groupKey, { id, timer });
-    }
+    const aggTimer = setTimeout(() => {
+      groupKeyRef.current.delete(groupKey);
+    }, AGGREGATE_WINDOW_MS);
+    groupKeyRef.current.set(groupKey, { id, timer: aggTimer });
   }, [dismiss]);
 
-  const clearHistory = useCallback(() => setHistory([]), []);
+  const markRead = useCallback((id: string) => {
+    setCenter(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+  }, []);
+
+  const markAllRead = useCallback(() => {
+    setCenter(prev => prev.map(n => ({ ...n, read: true })));
+  }, []);
+
+  const clearAll = useCallback(() => {
+    setCenter([]);
+    groupKeyRef.current.clear();
+  }, []);
+
+  const unreadCount = center.filter(n => !n.read).length;
 
   return (
-    <NotificationContext.Provider value={{ notifications, history, push, dismiss, clearHistory }}>
+    <NotificationContext.Provider value={{
+      notifications, center, unreadCount,
+      push, dismiss, markRead, markAllRead, clearAll,
+    }}>
       {children}
     </NotificationContext.Provider>
   );

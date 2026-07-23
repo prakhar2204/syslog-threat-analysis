@@ -1,4 +1,5 @@
 import { useRef, useEffect, useState } from 'react';
+import { ScrollText } from 'lucide-react';
 import type { LogEntry, Severity } from '../../types';
 import { formatTime, truncate } from '../../utils/formatters';
 
@@ -48,8 +49,12 @@ export default function LogStream({ logs }: Props) {
         className="log-stream overflow-y-auto max-h-64 text-xs font-mono"
       >
         {logs.length === 0 ? (
-          <div className="p-4 text-center text-text-secondary text-xs">
-            No logs received. Start monitoring a log file.
+          <div className="p-8 text-center">
+            <ScrollText size={22} className="text-text-secondary/25 mx-auto mb-2" />
+            <div className="text-xs text-text-secondary font-medium">No logs received</div>
+            <div className="text-[10px] text-text-secondary/60 mt-1">
+              Start monitoring a log file or run the Simulator
+            </div>
           </div>
         ) : (
           <table className="w-full">
