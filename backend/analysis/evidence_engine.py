@@ -17,23 +17,18 @@ from __future__ import annotations
 
 import logging
 import re
-from collections import defaultdict
-from datetime import datetime
 from typing import Optional
 
 from analysis.ioc_extractor import extract_iocs
-from detection.rules import RULES_BY_ID
 from models.events import (
     Alert,
     Evidence,
-    ExtractedIOC,
     Incident,
     LogEntry,
     MatchedCondition,
     Observation,
     ObservationStatus,
     RawLogRef,
-    Severity,
 )
 
 logger = logging.getLogger(__name__)

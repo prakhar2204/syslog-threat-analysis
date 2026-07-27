@@ -20,7 +20,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Optional
 
-from config import SAMPLE_LOGS_DIR, LOG_WATCH_DIRS
+from config import SAMPLE_LOGS_DIR
 from services.log_watcher import LogWatcher
 from services.pipeline import pipeline
 

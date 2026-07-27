@@ -15,7 +15,7 @@ from datetime import datetime
 from typing import Optional
 
 from detection.rules import DETECTION_RULES, RULES_BY_ID
-from models.events import Alert, AlertStatus, LogEntry, Severity
+from models.events import Alert, AlertStatus, LogEntry
 
 logger = logging.getLogger(__name__)
 

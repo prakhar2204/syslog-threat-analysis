@@ -9,11 +9,10 @@ frequency, confidence, and timeline.
 from __future__ import annotations
 
 import logging
-from collections import defaultdict
 from datetime import datetime
 from typing import Optional
 
-from models.events import Alert, ExtractedIOC, LogEntry
+from models.events import Alert, LogEntry
 
 logger = logging.getLogger(__name__)
 

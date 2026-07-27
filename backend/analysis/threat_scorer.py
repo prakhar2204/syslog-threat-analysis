@@ -11,7 +11,6 @@ Produces: threat_score (0-100), priority (SOC queue position).
 from __future__ import annotations
 
 from models.events import Incident, Severity
-from config import SEVERITY_ORDER
 
 
 def calculate_threat_score(incident: Incident) -> dict:

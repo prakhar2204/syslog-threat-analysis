@@ -13,7 +13,6 @@ Output files are written to backend/sample_logs/
 
 from __future__ import annotations
 
-import os
 import random
 from datetime import datetime, timedelta
 from pathlib import Path

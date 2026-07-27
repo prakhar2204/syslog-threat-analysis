@@ -12,11 +12,10 @@ from __future__ import annotations
 
 import logging
 from collections import Counter, defaultdict
-from datetime import datetime
 from typing import Optional
 
 from analysis.evidence_engine import EvidenceEngine
-from analysis.evidence_graph import EvidenceGraph, NodeType, EdgeType
+from analysis.evidence_graph import EvidenceGraph
 from analysis.incident_builder import IncidentBuilder
 from analysis.incident_merger import IncidentMerger
 from analysis.ioc_relationship import IOCRelationshipEngine
@@ -27,12 +26,9 @@ from detection.threat_engine import ThreatEngine
 from models.events import (
     Alert,
     DashboardStats,
-    Evidence,
     Incident,
     LogEntry,
     MonitoringStatus,
-    Observation,
-    Severity,
 )
 from parser.log_parser import LogParser
 from websocket.manager import ws_manager

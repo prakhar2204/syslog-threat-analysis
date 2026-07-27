@@ -12,11 +12,9 @@ from __future__ import annotations
 
 import uuid
 import logging
-from collections import defaultdict
-from datetime import datetime, timedelta
 from typing import Optional
 
-from models.events import Incident, Severity
+from models.events import Incident
 
 logger = logging.getLogger(__name__)
 

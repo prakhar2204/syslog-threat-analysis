@@ -21,6 +21,7 @@ build/
 
 # Logs
 *.log
+backend/sample_logs/simulation.log
 
 # OS
 .DS_Store

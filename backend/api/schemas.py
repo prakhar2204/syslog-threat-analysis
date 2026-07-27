@@ -42,25 +42,3 @@ class SimulationStartRequest(BaseModel):
 class SimulationGenerateRequest(BaseModel):
     scenarios: Optional[list[str]] = None
     target_user: str = "admin"
-
-
-class LogQueryParams(BaseModel):
-    search: Optional[str] = None
-    severity: Optional[str] = None
-    event_type: Optional[str] = None
-    source_ip: Optional[str] = None
-    username: Optional[str] = None
-    service: Optional[str] = None
-    limit: int = 200
-    offset: int = 0
-
-
-class PaginatedResponse(BaseModel):
-    items: list
-    total: int
-    limit: int
-    offset: int
-
-
-class ExportRequest(BaseModel):
-    format: str = "json"  # json, csv, pdf

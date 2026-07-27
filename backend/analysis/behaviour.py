@@ -12,7 +12,6 @@ from __future__ import annotations
 
 import logging
 from collections import defaultdict
-from datetime import timedelta
 
 from models.events import Alert, Incident, LogEntry
 

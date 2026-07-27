@@ -51,28 +51,7 @@ SEVERITY_ORDER = {
     SEVERITY_INFO: 0,
 }
 
-SEVERITY_COLORS = {
-    SEVERITY_CRITICAL: "#dc3545",
-    SEVERITY_HIGH: "#e67700",
-    SEVERITY_MEDIUM: "#ffc107",
-    SEVERITY_LOW: "#0d6efd",
-    SEVERITY_INFO: "#198754",
-}
 
-# ---------------------------------------------------------------------------
-# Event type classifications
-# ---------------------------------------------------------------------------
-EVENT_TYPES = [
-    "Authentication",
-    "Network",
-    "Firewall",
-    "Web Server",
-    "System",
-    "Kernel",
-    "Application",
-    "File Access",
-    "Unknown",
-]
 
 # ---------------------------------------------------------------------------
 # Correlation thresholds

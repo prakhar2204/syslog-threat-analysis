@@ -21,7 +21,6 @@ from api.routes import router as api_router, set_monitor, set_simulator
 from config import CORS_ORIGINS, PROJECT_DESCRIPTION, PROJECT_NAME, PROJECT_VERSION
 from services.monitoring import monitor_manager
 from services.simulator import simulator
-from services.pipeline import pipeline
 from websocket.manager import ws_manager
 
 # ---------------------------------------------------------------------------
@@ -84,15 +83,10 @@ app = FastAPI(
     redoc_url="/redoc" if ENVIRONMENT != "production" else None,
 )
 
-# CORS - merge env overrides with config defaults
-_env_origins = os.environ.get("CORS_ORIGINS", "")
-_origins = list(CORS_ORIGINS)
-if _env_origins:
-    _origins.extend([o.strip() for o in _env_origins.split(",") if o.strip()])
-
+# CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=_origins,
+    allow_origins=list(CORS_ORIGINS),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -135,8 +129,7 @@ async def websocket_endpoint(websocket: WebSocket):
     await ws_manager.connect(websocket)
     try:
         while True:
-            data = await websocket.receive_text()
-            # Client heartbeat pings - no action needed
+            await websocket.receive_text()  # client heartbeat pings
     except WebSocketDisconnect:
         ws_manager.disconnect(websocket)
     except Exception:

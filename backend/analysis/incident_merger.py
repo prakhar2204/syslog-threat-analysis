@@ -13,10 +13,8 @@ before incidents are considered valid.
 from __future__ import annotations
 
 import logging
-from datetime import timedelta
-from typing import Optional
 
-from models.events import Incident, IncidentStatus, Severity
+from models.events import Incident, IncidentStatus
 
 logger = logging.getLogger(__name__)
 

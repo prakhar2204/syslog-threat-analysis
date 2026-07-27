@@ -12,8 +12,7 @@ No AI APIs — everything is template-driven from real evidence.
 
 from __future__ import annotations
 
-from datetime import datetime
-from models.events import Incident, Severity
+from models.events import Incident
 
 
 # ---------------------------------------------------------------------------

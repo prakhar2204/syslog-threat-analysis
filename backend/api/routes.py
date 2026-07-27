@@ -25,7 +25,7 @@ from api.schemas import (
     SimulationGenerateRequest,
     SimulationStartRequest,
 )
-from config import LOG_WATCH_DIRS, SAMPLE_LOGS_DIR
+from config import LOG_WATCH_DIRS
 from reports.exporter import ReportExporter
 from services.pipeline import pipeline
 from services.monitoring import MonitorManager
@@ -837,8 +837,6 @@ async def upload_history():
 @router.get("/pipeline/health")
 async def pipeline_health():
     """Per-stage pipeline health for the Pipeline Visibility panel."""
-    from datetime import datetime as dt
-
     active_incidents = [i for i in pipeline.incidents if not i.is_merged]
     return {
         "monitoring": {

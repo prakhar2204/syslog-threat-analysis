@@ -12,7 +12,6 @@ import io
 import json
 import logging
 from datetime import datetime
-from typing import Any
 
 from config import PROJECT_NAME, PROJECT_VERSION
 from models.events import Alert, DashboardStats, Incident, LogEntry
