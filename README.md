@@ -2,7 +2,7 @@
 
 **Real-Time Linux Log Monitoring & Threat Investigation Platform**
 
-A self-contained, offline-capable SOC (Security Operations Centre) tool that reads Linux system logs, detects security threats using a rule-based engine, correlates related alerts into structured incidents, and presents everything through a live analyst dashboard**.
+A self-contained, offline-capable SOC (Security Operations Centre) tool that reads Linux system logs, detects security threats using a rule-based engine, correlates related alerts into structured incidents, and presents everything through a live analyst dashboard.
 
 ---
 
