@@ -2,9 +2,7 @@
 
 **Real-Time Linux Log Monitoring & Threat Investigation Platform**
 
-A self-contained, offline-capable SOC (Security Operations Centre) tool that reads Linux system logs, detects security threats using a rule-based engine, correlates related alerts into structured incidents, and presents everything through a live analyst dashboard.
-
-Built as an internship project at **DRDO – Centre for Fire, Explosive & Environment Safety (CFEES)**.
+A self-contained, offline-capable SOC (Security Operations Centre) tool that reads Linux system logs, detects security threats using a rule-based engine, correlates related alerts into structured incidents, and presents everything through a live analyst dashboard.**.
 
 ---
 
@@ -360,4 +358,4 @@ The `netlify.toml` and `render.yaml` files in the project root contain the compl
 
 ## License
 
-This project was developed for educational and research purposes as part of an internship at DRDO – CFEES.
+This project was developed for educational and research purposes.
